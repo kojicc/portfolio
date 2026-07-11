@@ -293,8 +293,7 @@
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)">
         <a href="{{ resumeSrc }}" download="JeikoSy_Resume.pdf" data-cursor="hover" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#e7b53a;color:#0e0e0d;border-radius:999px;font-weight:600;font-size:14px">Download PDF ↓</a>
-        <label data-cursor="hover" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:transparent;color:#eceae0;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:14px;cursor:none">↺ Update résumé<input type="file" accept="application/pdf" onChange="{{ onResumeFile }}" style="display:none"></label>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#5a584f;flex:1;min-width:160px">updating swaps the copy on this device — send Jeiko the file to publish it for everyone</span>
+        <a href="{{ resumeSrc }}" target="_blank" rel="noopener" data-cursor="hover" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:transparent;color:#eceae0;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:14px">Open in new tab ↗</a>
       </div>
     </div>
   </div>
@@ -712,10 +711,6 @@ class Component extends DCLogic {
     this.rotTimer = setInterval(() => {
       this.setState((s) => ({ rot: (s.rot + 1) % this.rotWords.length }));
     }, 2400);
-    try {
-      const saved = localStorage.getItem('jeiko-resume-v1');
-      if (saved) this.setResumeFromDataUrl(saved);
-    } catch (e) {}
   }
   componentWillUnmount() {
     clearInterval(this.clock);
@@ -1210,6 +1205,85 @@ class Component extends DCLogic {
     document.body.appendChild(btn);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+<!-- Cursor theme picker (desktop only). Swaps the custom cursor for a themed
+     emoji that follows the pointer. Lives outside #pf-root; persists choice. -->
+<script>
+(function () {
+  if (!window.matchMedia || !window.matchMedia('(pointer:fine)').matches) return; // desktop only
+  var GLYPH = { 'default': '', 'one-piece': '👒', 'zelda': '🗡️', 'cooking': '🍳', 'fnaf': '🔦', 'spiderman': '🕷️' };
+  var LABELS = [
+    ['default', '✦ Default'], ['one-piece', '👒 One Piece'], ['zelda', '🗡️ Zelda'],
+    ['cooking', '🍳 Cooking'], ['fnaf', '🔦 FNAF'], ['spiderman', '🕷️ Spider-Man']
+  ];
+  var current = 'default', mx = window.innerWidth / 2, my = window.innerHeight / 2;
+
+  var glyph = document.createElement('div');
+  glyph.id = 'cursor-glyph';
+  glyph.style.cssText = 'position:fixed;top:0;left:0;z-index:10005;pointer-events:none;font-size:27px;line-height:1;display:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45))';
+  document.body.appendChild(glyph);
+
+  window.addEventListener('mousemove', function (e) {
+    mx = e.clientX; my = e.clientY;
+    if (current !== 'default') glyph.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
+  }, { passive: true });
+
+  function apply(theme) {
+    if (!(theme in GLYPH)) theme = 'default';
+    current = theme;
+    var ring = document.getElementById('cursor-ring'), dot = document.getElementById('cursor-dot');
+    if (theme === 'default') {
+      glyph.style.display = 'none';
+      if (ring) ring.style.visibility = 'visible';
+      if (dot) dot.style.visibility = 'visible';
+    } else {
+      glyph.textContent = GLYPH[theme];
+      glyph.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
+      glyph.style.display = 'block';
+      if (ring) ring.style.visibility = 'hidden';
+      if (dot) dot.style.visibility = 'hidden';
+    }
+    var f = document.getElementById('cursor-fab'); if (f) f.textContent = theme === 'default' ? '✦' : GLYPH[theme];
+    [].forEach.call(document.querySelectorAll('#cursor-menu button'), function (b) {
+      b.style.background = b.getAttribute('data-theme') === theme ? 'rgba(231,181,58,.2)' : 'transparent';
+    });
+    try { localStorage.setItem('jeiko-cursor', theme); } catch (e) {}
+  }
+
+  var fab = document.createElement('button');
+  fab.id = 'cursor-fab';
+  fab.setAttribute('aria-label', 'Change cursor theme');
+  fab.textContent = '✦';
+  fab.style.cssText = 'position:fixed;right:18px;bottom:calc(80px + env(safe-area-inset-bottom,0px));z-index:10001;' +
+    'width:50px;height:50px;border-radius:50%;border:2px solid #0e0e0d;background:#e7b53a;color:#0e0e0d;' +
+    'font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.4)';
+
+  var menu = document.createElement('div');
+  menu.id = 'cursor-menu';
+  menu.style.cssText = 'position:fixed;right:18px;bottom:calc(140px + env(safe-area-inset-bottom,0px));z-index:10002;' +
+    'display:none;flex-direction:column;gap:2px;background:#141310;border:1px solid rgba(231,181,58,.3);' +
+    'border-radius:12px;padding:6px;box-shadow:0 16px 40px rgba(0,0,0,.5);min-width:158px';
+  LABELS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.textContent = p[1];
+    b.setAttribute('data-theme', p[0]);
+    b.style.cssText = 'text-align:left;background:transparent;border:0;color:#eceae0;font-family:inherit;font-size:13px;padding:8px 11px;border-radius:8px;cursor:pointer;white-space:nowrap';
+    b.onmouseenter = function () { if (b.getAttribute('data-theme') !== current) b.style.background = 'rgba(255,255,255,.06)'; };
+    b.onmouseleave = function () { if (b.getAttribute('data-theme') !== current) b.style.background = 'transparent'; };
+    b.onclick = function () { apply(p[0]); menu.style.display = 'none'; };
+    menu.appendChild(b);
+  });
+
+  fab.onclick = function (e) { e.stopPropagation(); menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex'; };
+  document.addEventListener('click', function (e) { if (e.target !== fab && !menu.contains(e.target)) menu.style.display = 'none'; });
+
+  document.body.appendChild(fab);
+  document.body.appendChild(menu);
+
+  var saved = 'default'; try { saved = localStorage.getItem('jeiko-cursor') || 'default'; } catch (e) {}
+  apply(saved);
 })();
 </script>
 </body>

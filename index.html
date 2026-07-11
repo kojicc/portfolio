@@ -22,7 +22,9 @@
 <meta name="twitter:description" content="I turn the boring, done-by-hand stuff into software. Open to full-time roles and freelance builds.">
 <meta name="twitter:image" content="https://portfolio-seven-cyan-39.vercel.app/assets/og-banner.png">
 
-<link rel="icon" href="assets/og-banner.png">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -104,8 +106,17 @@
   }
 
   @media (max-width:560px){
-    /* small phones: drop the inline nav links, keep the résumé CTA */
-    nav[style] > div:last-child a{ display:none !important; }
+    /* small phones: KEEP the quick-nav links. Shrink the logo to just the
+       "JS" badge (hide the wordmark) to free up the room they need. */
+    nav[style] a[href="#top"]{ font-size:0 !important; gap:0 !important; }
+    nav[style] a[href="#top"] span{ font-size:13px !important; }
+    nav[style] > div:last-child{
+      gap:11px !important;
+      font-size:11.5px !important;
+      flex-wrap:wrap !important;
+      justify-content:flex-end !important;
+      row-gap:6px !important;
+    }
     /* smaller hero name so it doesn't dominate the first screen */
     #pf-root header h1[style]{ font-size:clamp(46px,15vw,168px) !important; }
   }

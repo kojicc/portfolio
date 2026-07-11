@@ -59,12 +59,18 @@
   @keyframes jshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-14px,8px) rotate(-2deg)}40%{transform:translate(12px,-10px) rotate(2deg)}60%{transform:translate(-10px,-6px) rotate(-1deg)}80%{transform:translate(10px,8px) rotate(1.5deg)}}
   @keyframes eyeflare{0%,100%{opacity:.85;filter:drop-shadow(0 0 8px rgba(255,220,80,.8))}50%{opacity:1;filter:drop-shadow(0 0 18px rgba(255,220,80,1))}}
 
-  /* ---- RESPONSIVE (tablet / phone) ----
-     Uses property-name substring selectors so it holds up regardless of the
-     exact inline-style values the runtime serializes. */
-  @media (max-width:768px){
-    /* collapse every inline grid to a single column */
-    #pf-root [style*="grid-template-columns"]{
+  /* ---- RESPONSIVE (all devices) ----
+     Property-name substring selectors so it holds up regardless of the exact
+     inline-style values the runtime serializes. Three tiers:
+       ≤1000px  tablets / small laptops — stack the fixed two-column blocks
+       ≤620px   phones — also stack the auto-fit card grids
+       ≤560px   small phones — simplify the nav, shrink the hero */
+
+  /* TABLETS & SMALL LAPTOPS: collapse only the FIXED multi-column blocks
+     (spotlight, about, experience). Leave the auto-fit card grids alone so
+     they keep showing 2–3 cards per row where there's room. */
+  @media (max-width:1000px){
+    #pf-root [style*="grid-template-columns"]:not([style*="minmax"]){
       grid-template-columns:1fr !important;
       gap:18px !important;
     }
@@ -78,6 +84,12 @@
       border-top:1px solid rgba(255,255,255,.07) !important;
       min-height:200px !important;
     }
+  }
+
+  /* PHONES & DOWN */
+  @media (max-width:620px){
+    /* now collapse the auto-fit card grids too */
+    #pf-root [style*="minmax"]{ grid-template-columns:1fr !important; }
     /* reclaim horizontal room without touching vertical rhythm */
     #pf-root section[style],
     #pf-root header[style],
@@ -92,9 +104,9 @@
   }
 
   @media (max-width:560px){
-    /* phones: drop the inline nav links, keep the résumé CTA */
+    /* small phones: drop the inline nav links, keep the résumé CTA */
     nav[style] > div:last-child a{ display:none !important; }
-    /* slightly smaller hero name so it doesn't dominate the first screen */
+    /* smaller hero name so it doesn't dominate the first screen */
     #pf-root header h1[style]{ font-size:clamp(46px,15vw,168px) !important; }
   }
 </style>

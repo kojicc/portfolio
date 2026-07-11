@@ -3,6 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Jeiko Sy — Full-Stack Developer</title>
+<meta name="description" content="Jeiko Sy — full-stack developer who turns the boring, done-by-hand stuff into software. Open to full-time roles and freelance builds.">
+
+<!-- Link preview / social share.
+     og:url and og:image use the live domain below. If you add a custom
+     domain later, just swap the domain in these two URLs. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://portfolio-seven-cyan-39.vercel.app/">
+<meta property="og:title" content="Jeiko Sy — Full-Stack Developer">
+<meta property="og:description" content="I turn the boring, done-by-hand stuff into software. Open to full-time roles and freelance builds.">
+<meta property="og:image" content="https://portfolio-seven-cyan-39.vercel.app/assets/og-banner.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jeiko Sy — Full-Stack Developer">
+<meta name="twitter:description" content="I turn the boring, done-by-hand stuff into software. Open to full-time roles and freelance builds.">
+<meta name="twitter:image" content="https://portfolio-seven-cyan-39.vercel.app/assets/og-banner.png">
+
+<link rel="icon" href="assets/og-banner.png">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -38,6 +58,47 @@
   @keyframes jumpin{0%{transform:scale(.2) rotate(-4deg);opacity:0}18%{opacity:1}100%{transform:scale(1.25) rotate(2deg);opacity:1}}
   @keyframes jshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-14px,8px) rotate(-2deg)}40%{transform:translate(12px,-10px) rotate(2deg)}60%{transform:translate(-10px,-6px) rotate(-1deg)}80%{transform:translate(10px,8px) rotate(1.5deg)}}
   @keyframes eyeflare{0%,100%{opacity:.85;filter:drop-shadow(0 0 8px rgba(255,220,80,.8))}50%{opacity:1;filter:drop-shadow(0 0 18px rgba(255,220,80,1))}}
+
+  /* ---- RESPONSIVE (tablet / phone) ---- */
+  @media (max-width:860px){
+    /* collapse fixed multi-column layouts to a single column */
+    [style*="grid-template-columns:1.1fr .9fr"],
+    [style*="grid-template-columns:320px 1fr"],
+    [style*="grid-template-columns:1fr 244px"]{
+      grid-template-columns:1fr !important;
+    }
+    /* the About portrait panel: drop the side border, add a bottom one */
+    [style*="grid-template-columns:320px 1fr"] > div:first-child{
+      border-right:0 !important;
+      border-bottom:1px solid rgba(255,255,255,.08) !important;
+    }
+    /* the Cast LMS spotlight image panel: move divider to the top */
+    [style*="grid-template-columns:1.1fr .9fr"] > div:last-child{
+      border-left:0 !important;
+      border-top:1px solid rgba(255,255,255,.07) !important;
+      min-height:220px !important;
+    }
+    /* nav: tighten spacing so links don't overflow */
+    nav[style*="padding:16px 28px"]{ padding:13px 18px !important; }
+    [style*="gap:22px;font-size:13.5px"]{ gap:15px !important; font-size:13px !important; }
+  }
+
+  @media (max-width:620px){
+    /* stack the two-up About sub-grid (How I work / Off the clock) */
+    [style*="grid-template-columns:1fr 1fr"]{ grid-template-columns:1fr !important; }
+    /* project cards go full width (min 300px was clipping on phones) */
+    [style*="minmax(300px,1fr)"],
+    [style*="minmax(280px,1fr)"]{ grid-template-columns:1fr !important; }
+    /* trim section side padding to reclaim room */
+    [style*="padding:60px 28px"]{ padding:44px 20px !important; }
+    [style*="padding:40px 28px 60px"]{ padding:30px 20px 44px !important; }
+    header[style*="28px"]{ padding-left:20px !important; padding-right:20px !important; }
+    footer [style*="padding:70px 28px"]{ padding:52px 20px !important; }
+    /* nav: let items wrap and shrink further on tiny screens */
+    [style*="gap:22px;font-size:13.5px"]{ gap:12px !important; font-size:12px !important; flex-wrap:wrap !important; justify-content:flex-end; }
+    /* experience timeline rail: give thumbnails real height when stacked */
+    [style*="grid-template-columns:1fr 244px"] button[style*="height:60px"]{ height:70px !important; }
+  }
 </style>
 </helmet>
 

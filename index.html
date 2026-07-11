@@ -167,6 +167,9 @@
   }
   #theme-toggle:hover{ transform:scale(1.08); }
 
+  /* The old custom gold cursor (ring + dot) is retired for good. !important
+     so the component's re-renders can't bring it back. */
+  #cursor-ring, #cursor-dot{ display:none !important; }
   /* Cursor theme picker is desktop-only. Hard-hide it on touch devices. */
   @media (pointer:coarse){ #cursor-fab, #cursor-menu, #cursor-glyph{ display:none !important; } }
   /* "Default" theme = the real system cursor (the custom gold dot is gone). */

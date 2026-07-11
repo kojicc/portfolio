@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e0e0d">
 
 <title>Jeiko Sy — Full-Stack Developer</title>
 <meta name="description" content="Jeiko Sy — full-stack developer who turns the boring, done-by-hand stuff into software. Open to full-time roles and freelance builds.">
@@ -57,7 +58,7 @@
   @keyframes track{0%{top:-18%}100%{top:118%}}
   @keyframes burst{0%,93%,100%{opacity:0}94%{opacity:.55}95%{opacity:.08}96%{opacity:.5}97%{opacity:.12}98%{opacity:.4}}
   @keyframes titleglitch{0%,97%,100%{transform:translate(0,0)}97.5%{transform:translate(-2px,1px)}98.5%{transform:translate(2px,-1px)}}
-  @keyframes jumpin{0%{transform:scale(.2) rotate(-4deg);opacity:0}18%{opacity:1}100%{transform:scale(1.25) rotate(2deg);opacity:1}}
+  @keyframes jumpin{0%{transform:scale(.7);opacity:0}30%{opacity:1}100%{transform:scale(1);opacity:1}}
   @keyframes jshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-14px,8px) rotate(-2deg)}40%{transform:translate(12px,-10px) rotate(2deg)}60%{transform:translate(-10px,-6px) rotate(-1deg)}80%{transform:translate(10px,8px) rotate(1.5deg)}}
   @keyframes eyeflare{0%,100%{opacity:.85;filter:drop-shadow(0 0 8px rgba(255,220,80,.8))}50%{opacity:1;filter:drop-shadow(0 0 18px rgba(255,220,80,1))}}
 
@@ -165,6 +166,25 @@
     box-shadow:0 6px 20px rgba(0,0,0,.4); transition:transform .15s;
   }
   #theme-toggle:hover{ transform:scale(1.08); }
+
+  /* ACCESSIBILITY — lift the darkest caption greys (which failed WCAG AA
+     contrast, ~2.8:1 on the dark background) to a legible tone. These hexes
+     are only ever used as text colour. Runtime serialises hex to rgb(). */
+  #pf-root [style*="rgb(99, 97, 90)"],
+  #pf-root [style*="rgb(90, 88, 79)"],
+  #pf-root [style*="rgb(84, 82, 75)"]{ color:#8a877d !important; }
+
+  /* ACCESSIBILITY — respect the OS "reduce motion" setting. Kills the marquee,
+     floats, scramble, dog-rain and the jump-scare shake for anyone who has
+     asked their system to minimize animation. */
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration:0.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.001ms !important;
+      scroll-behavior:auto !important;
+    }
+  }
 </style>
 </helmet>
 
@@ -177,8 +197,8 @@
 
 
 <sc-if value="{{ foxy }}" hint-placeholder-val="{{ noToast }}">
-  <div aria-hidden="true" style="position:fixed;inset:0;z-index:9998;background:#020101;display:grid;place-items:center;overflow:hidden;pointer-events:none;animation:jshake .12s linear infinite">
-    <div style="position:relative;width:min(70vw,440px);height:min(70vw,440px);animation:jumpin .28s cubic-bezier(.2,.9,.3,1.4) forwards">
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:9998;background:rgba(4,2,1,.92);display:grid;place-items:center;overflow:hidden;pointer-events:none">
+    <div style="position:relative;width:min(60vw,380px);height:min(60vw,380px);animation:jumpin .5s ease-out forwards">
       <!-- ears -->
       <div style="position:absolute;top:-4%;left:6%;width:0;height:0;border-left:52px solid transparent;border-right:20px solid transparent;border-bottom:120px solid #7a2f16;transform:rotate(-18deg)"></div>
       <div style="position:absolute;top:-4%;right:6%;width:0;height:0;border-left:20px solid transparent;border-right:52px solid transparent;border-bottom:120px solid #7a2f16;transform:rotate(18deg)"></div>
@@ -825,7 +845,7 @@ class Component extends DCLogic {
   foxyScare = () => {
     clearTimeout(this.foxyTimer);
     this.setState({ foxy: true });
-    this.foxyTimer = setTimeout(() => this.setState({ foxy: false }), 1150);
+    this.foxyTimer = setTimeout(() => this.setState({ foxy: false }), 850);
   };
 
   openContact = () => this.setState({ contactOpen: true });

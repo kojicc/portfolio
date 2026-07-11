@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#0e0e0d;color:#eceae0;font-family:'Space Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:#e7b53a;text-decoration:none}
+  a:hover{color:#f5d27a}
+  ::selection{background:#e7b53a;color:#0e0e0d}
+  @media (pointer:fine){body{cursor:none}}
+  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes fall{0%{transform:translateY(-12vh) rotate(0deg);opacity:0}8%{opacity:1}100%{transform:translateY(112vh) rotate(320deg);opacity:1}}
+  @keyframes flick{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.35}94%{opacity:1}96%{opacity:.6}97%{opacity:1}}
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes flick2{0%,100%{opacity:1}44%{opacity:.82}46%{opacity:1}78%{opacity:.9}80%{opacity:1}}
+  @keyframes creep{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:.9;transform:translate(-50%,-52%) scale(1.04)}}
+  @keyframes textflick{0%,100%{opacity:1;text-shadow:0 0 26px rgba(231,181,58,.35)}47%{opacity:.92}48%{opacity:.7;text-shadow:0 0 6px rgba(231,181,58,.2)}49%{opacity:1}88%{opacity:.85}89%{opacity:1}}
+  @keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+  @keyframes noise{0%{background-position:0 0}25%{background-position:-3px 2px}50%{background-position:2px -3px}75%{background-position:-2px -2px}100%{background-position:3px 3px}}
+  @keyframes recblink{0%,55%{opacity:1}56%,100%{opacity:.15}}
+  @keyframes vpulse{0%,100%{opacity:.72}50%{opacity:.82}}
+  @keyframes track{0%{top:-18%}100%{top:118%}}
+  @keyframes burst{0%,93%,100%{opacity:0}94%{opacity:.55}95%{opacity:.08}96%{opacity:.5}97%{opacity:.12}98%{opacity:.4}}
+  @keyframes titleglitch{0%,97%,100%{transform:translate(0,0)}97.5%{transform:translate(-2px,1px)}98.5%{transform:translate(2px,-1px)}}
+  @keyframes jumpin{0%{transform:scale(.2) rotate(-4deg);opacity:0}18%{opacity:1}100%{transform:scale(1.25) rotate(2deg);opacity:1}}
+  @keyframes jshake{0%,100%{transform:translate(0,0)}20%{transform:translate(-14px,8px) rotate(-2deg)}40%{transform:translate(12px,-10px) rotate(2deg)}60%{transform:translate(-10px,-6px) rotate(-1deg)}80%{transform:translate(10px,8px) rotate(1.5deg)}}
+  @keyframes eyeflare{0%,100%{opacity:.85;filter:drop-shadow(0 0 8px rgba(255,220,80,.8))}50%{opacity:1;filter:drop-shadow(0 0 18px rgba(255,220,80,1))}}
+</style>
+</helmet>
+
+<div id="pf-root" style="position:relative;min-width:0">
+
+<div id="cursor-ring" style="position:fixed;top:0;left:0;width:34px;height:34px;margin:-17px 0 0 -17px;border:1.5px solid #e7b53a;border-radius:50%;pointer-events:none;z-index:9999;transition:width .18s,height .18s,margin .18s,background .18s,opacity .2s;mix-blend-mode:difference;opacity:0"></div>
+<div id="cursor-dot" style="position:fixed;top:0;left:0;width:6px;height:6px;margin:-3px 0 0 -3px;background:#e7b53a;border-radius:50%;pointer-events:none;z-index:10000;opacity:0"></div>
+<div id="lights-overlay" style="position:fixed;inset:0;z-index:60;pointer-events:none;opacity:0;transition:opacity .6s;background:radial-gradient(160px 160px at var(--mx,50%) var(--my,50%),transparent 0%,rgba(9,3,3,.93) 52%,rgba(2,1,1,.99) 100%)"></div>
+<div id="ghost" aria-hidden="true" style="position:fixed;left:72%;top:34%;z-index:61;pointer-events:none;opacity:0;transition:opacity 1.4s;font-size:66px;transform:translate(-50%,-50%);filter:drop-shadow(0 0 16px rgba(225,75,58,.65))">🐻</div>
+
+
+<sc-if value="{{ foxy }}" hint-placeholder-val="{{ noToast }}">
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:9998;background:#020101;display:grid;place-items:center;overflow:hidden;pointer-events:none;animation:jshake .12s linear infinite">
+    <div style="position:relative;width:min(70vw,440px);height:min(70vw,440px);animation:jumpin .28s cubic-bezier(.2,.9,.3,1.4) forwards">
+      <!-- ears -->
+      <div style="position:absolute;top:-4%;left:6%;width:0;height:0;border-left:52px solid transparent;border-right:20px solid transparent;border-bottom:120px solid #7a2f16;transform:rotate(-18deg)"></div>
+      <div style="position:absolute;top:-4%;right:6%;width:0;height:0;border-left:20px solid transparent;border-right:52px solid transparent;border-bottom:120px solid #7a2f16;transform:rotate(18deg)"></div>
+      <!-- head -->
+      <div style="position:absolute;inset:8% 4% 0;background:radial-gradient(120% 120% at 50% 30%, #9a3d1c, #641f0d);border-radius:48% 48% 42% 42%/54% 54% 46% 46%;box-shadow:inset 0 -30px 50px rgba(0,0,0,.6)"></div>
+      <!-- eyes -->
+      <div style="position:absolute;top:34%;left:26%;width:15%;height:15%;background:radial-gradient(circle at 50% 50%, #fff3b0, #ffcf33 60%, #b8860b);border-radius:50%;animation:eyeflare .5s ease-in-out infinite"><div style="position:absolute;top:22%;left:34%;width:32%;height:56%;background:#0a0500;border-radius:50%"></div></div>
+      <div style="position:absolute;top:34%;right:26%;width:15%;height:15%;background:radial-gradient(circle at 50% 50%, #fff3b0, #ffcf33 60%, #b8860b);border-radius:50%;animation:eyeflare .5s ease-in-out infinite"><div style="position:absolute;top:22%;left:34%;width:32%;height:56%;background:#0a0500;border-radius:50%"></div></div>
+      <!-- snout -->
+      <div style="position:absolute;top:50%;left:50%;transform:translateX(-50%);width:34%;height:30%;background:linear-gradient(180deg,#7a2f16,#3d1408);border-radius:40% 40% 46% 46%"></div>
+      <div style="position:absolute;top:52%;left:50%;transform:translateX(-50%);width:11%;height:8%;background:#160803;border-radius:50%"></div>
+      <!-- gaping jaw + teeth -->
+      <div style="position:absolute;top:66%;left:50%;transform:translateX(-50%);width:46%;height:26%;background:#120401;border-radius:14% 14% 46% 46%;overflow:hidden;box-shadow:inset 0 8px 22px rgba(0,0,0,.9)">
+        <div style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-around">
+          <span style="width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:26px solid #efe9d6"></span><span style="width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:34px solid #efe9d6"></span><span style="width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:26px solid #efe9d6"></span><span style="width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:32px solid #efe9d6"></span><span style="width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:24px solid #efe9d6"></span>
+        </div>
+        <div style="position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around">
+          <span style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:24px solid #d8d0b8"></span><span style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:30px solid #d8d0b8"></span><span style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:22px solid #d8d0b8"></span><span style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:28px solid #d8d0b8"></span>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.3em;color:#e14b3a;text-shadow:0 0 14px rgba(225,75,58,.8)">IT'S ME</div>
+  </div>
+</sc-if>
+
+<sc-for list="{{ dogs }}" as="d" hint-placeholder-count="0">
+  <span style="position:fixed;top:0;z-index:70;font-size:38px;pointer-events:none;left:{{ d.left }};animation:fall {{ d.dur }} linear {{ d.delay }} forwards">{{ d.emoji }}</span>
+</sc-for>
+
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ noToast }}">
+  <div style="position:fixed;left:50%;bottom:38px;transform:translateX(-50%);z-index:88;background:#e7b53a;color:#0e0e0d;font-weight:700;font-size:15px;padding:13px 24px;border-radius:999px;box-shadow:0 14px 44px rgba(0,0,0,.5)">{{ toast }}</div>
+</sc-if>
+
+<sc-if value="{{ zelda }}" hint-placeholder-val="{{ noToast }}">
+  <div onClick="{{ closeZelda }}" data-cursor="hover" style="position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(6,5,3,.82);backdrop-filter:blur(4px);text-align:center;cursor:none">
+    <div>
+      <div style="position:relative;width:132px;height:112px;margin:0 auto 24px">
+        <div style="position:absolute;left:50%;top:0;transform:translateX(-50%);width:0;height:0;border-left:33px solid transparent;border-right:33px solid transparent;border-bottom:56px solid #e7b53a;filter:drop-shadow(0 0 16px rgba(231,181,58,.75));animation:float 3s ease-in-out infinite"></div>
+        <div style="position:absolute;left:2px;bottom:0;width:0;height:0;border-left:33px solid transparent;border-right:33px solid transparent;border-bottom:56px solid #e7b53a;filter:drop-shadow(0 0 16px rgba(231,181,58,.6))"></div>
+        <div style="position:absolute;right:2px;bottom:0;width:0;height:0;border-left:33px solid transparent;border-right:33px solid transparent;border-bottom:56px solid #e7b53a;filter:drop-shadow(0 0 16px rgba(231,181,58,.6))"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;color:#e7b53a;font-size:12.5px;letter-spacing:.14em;margin-bottom:12px">✦ SECRET FOUND ✦</div>
+      <div style="font-size:24px;font-weight:700;max-width:380px;margin:0 auto;line-height:1.25">It's dangerous to go alone! Take this.</div>
+      <a href="uploads/JeikoSyCV_2025.pdf" download data-cursor="hover" style="display:inline-block;margin-top:22px;padding:13px 24px;background:#e7b53a;color:#0e0e0d;border-radius:999px;font-weight:700;font-size:15px">Take my résumé →</a>
+      <div style="margin-top:16px;font-size:11px;color:#8f8c81;font-family:'JetBrains Mono',monospace">click anywhere to close</div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ contactOpen }}" hint-placeholder-val="{{ contactOpen }}">
+  <div onClick="{{ closeContact }}" data-cursor="hover" style="position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:24px;background:rgba(4,3,1,.72);backdrop-filter:blur(6px);cursor:none">
+    <div onClick="{{ stopProp }}" style="width:min(480px,100%);background:#141310;border:1px solid rgba(231,181,58,.28);border-radius:20px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.6)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid rgba(255,255,255,.08)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:#e7b53a">// say hi</div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:4px">Let's talk</div>
+        </div>
+        <button onClick="{{ closeContact }}" data-cursor="hover" style="width:34px;height:34px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#c2bfb4;font-size:16px;cursor:none">✕</button>
+      </div>
+      <div style="padding:24px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <input id="cf-name" type="text" placeholder="Your name" style="flex:1;min-width:130px;padding:12px 14px;background:#0f0e0b;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#eceae0;font-family:inherit;font-size:14px;outline:none" style-focus="border-color:#e7b53a">
+            <input id="cf-email" type="email" placeholder="Your email (optional)" style="flex:1;min-width:130px;padding:12px 14px;background:#0f0e0b;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#eceae0;font-family:inherit;font-size:14px;outline:none" style-focus="border-color:#e7b53a">
+          </div>
+          <textarea id="cf-msg" rows="4" placeholder="What are you building? Got something tedious you'd like automated?" style="width:100%;padding:12px 14px;background:#0f0e0b;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#eceae0;font-family:inherit;font-size:14px;line-height:1.5;outline:none;resize:vertical" style-focus="border-color:#e7b53a"></textarea>
+          <button onClick="{{ sendMessage }}" data-cursor="hover" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 22px;background:#e7b53a;color:#0e0e0d;border:0;border-radius:999px;font-weight:700;font-size:15px;font-family:inherit;cursor:none">Send message →</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin:20px 0;color:#5a584f;font-family:'JetBrains Mono',monospace;font-size:11px"><span style="flex:1;height:1px;background:rgba(255,255,255,.1)"></span>or<span style="flex:1;height:1px;background:rgba(255,255,255,.1)"></span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onClick="{{ bookCall }}" data-cursor="hover" style="flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;background:transparent;color:#eceae0;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:14px;font-family:inherit;cursor:none">📅 Book a 15-min call</button>
+          <button onClick="{{ copyEmail }}" data-cursor="hover" style="flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;background:transparent;color:#eceae0;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:14px;font-family:inherit;cursor:none">⧉ Copy email</button>
+        </div>
+        <p style="margin:18px 0 0;font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.6;color:#5a584f;text-align:center">opens your own email app — no form endpoint, nothing stored, no spam</p>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ resumeOpen }}" hint-placeholder-val="{{ resumeOpen }}">
+  <div onClick="{{ closeResume }}" data-cursor="hover" style="position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:24px;background:rgba(4,3,1,.74);backdrop-filter:blur(6px);cursor:none">
+    <div onClick="{{ stopProp }}" style="width:min(760px,100%);background:#141310;border:1px solid rgba(231,181,58,.28);border-radius:20px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.6);display:flex;flex-direction:column;max-height:90vh">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.08)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:#e7b53a">// résumé</div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.02em;margin-top:4px">Jeiko Emmanuel B. Sy</div>
+        </div>
+        <button onClick="{{ closeResume }}" data-cursor="hover" style="width:34px;height:34px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#c2bfb4;font-size:16px;cursor:none">✕</button>
+      </div>
+      <div style="padding:16px 16px 0;overflow:auto">
+        {{ resumeEl }}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)">
+        <a href="{{ resumeSrc }}" download="JeikoSy_Resume.pdf" data-cursor="hover" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#e7b53a;color:#0e0e0d;border-radius:999px;font-weight:600;font-size:14px">Download PDF ↓</a>
+        <label data-cursor="hover" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:transparent;color:#eceae0;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:14px;cursor:none">↺ Update résumé<input type="file" accept="application/pdf" onChange="{{ onResumeFile }}" style="display:none"></label>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#5a584f;flex:1;min-width:160px">updating swaps the copy on this device — send Jeiko the file to publish it for everyone</span>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- NAV -->
+<nav style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;background:rgba(14,14,13,.72);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07)">
+  <a href="#top" onClick="{{ zeldaSecret }}" data-cursor="hover" title="click me…" style="display:flex;align-items:center;gap:10px;color:#eceae0;font-weight:700;letter-spacing:-.02em">
+    <span style="display:grid;place-items:center;width:30px;height:30px;background:#e7b53a;color:#0e0e0d;border-radius:8px;font-family:'JetBrains Mono',monospace;font-weight:700">JS</span>
+    Jeiko Sy
+  </a>
+  <div style="display:flex;align-items:center;gap:22px;font-size:13.5px;font-weight:500">
+    <a href="#work" data-cursor="hover" style="color:#b8b5aa">work</a>
+    <a href="#about" data-cursor="hover" style="color:#b8b5aa">about</a>
+    <a href="#experience" data-cursor="hover" style="color:#b8b5aa">experience</a>
+    <a href="#contact" data-cursor="hover" style="color:#b8b5aa">contact</a>
+    <button onClick="{{ openResume }}" data-cursor="hover" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:#e7b53a;color:#0e0e0d;border:0;border-radius:999px;font-weight:600;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:none">résumé</button>
+  </div>
+</nav>
+
+<!-- HERO — EDITORIAL -->
+<header id="top" style="position:relative;max-width:1180px;margin:0 auto;padding:clamp(76px,12vw,150px) 28px clamp(60px,8vw,104px)">
+  <div aria-hidden="true" style="position:absolute;top:-6%;left:50%;transform:translateX(-50%);width:min(760px,92%);height:520px;z-index:0;pointer-events:none;background:radial-gradient(closest-side, rgba(231,181,58,.14), transparent 72%)"></div>
+
+  <div style="position:relative;z-index:1">
+    <div data-reveal style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.04em;color:#8f8c81;margin-bottom:30px">
+      <span style="display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border:1px solid rgba(231,181,58,.32);border-radius:999px;color:#e7b53a">
+        <span style="width:7px;height:7px;border-radius:50%;background:#4fe0a8;box-shadow:0 0 0 3px rgba(79,224,168,.18)"></span>open to work
+      </span>
+      <span>General Trias, Cavite · PH</span>
+    </div>
+
+    <h1 onMouseEnter="{{ scramble }}" data-cursor="hover" style="margin:0;font-weight:700;letter-spacing:-.045em;line-height:.88;font-size:clamp(58px,13vw,168px);cursor:none;color:#f3ecd9">{{ name }}</h1>
+
+    <div data-reveal style="margin-top:26px;font-size:clamp(20px,2.6vw,29px);font-weight:500;letter-spacing:-.01em;color:#eceae0;line-height:1.3">
+      Full-stack developer who builds the boring, done-by-hand stuff <span style="color:#e7b53a">into software</span><span aria-hidden="true" style="display:inline-block;width:2px;height:1em;margin-left:3px;vertical-align:-2px;background:#e7b53a;animation:blink 1s step-end infinite"></span>
+    </div>
+
+    <div data-reveal style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:28px;margin-top:34px">
+      <p style="max-width:560px;margin:0;font-size:clamp(16px,2vw,19px);line-height:1.6;color:#a8a59a;text-wrap:pretty">
+        I build because I genuinely like solving problems — I'll look at something slow, or still done on paper, and think “I can probably build that.” I do what a project needs, then the improvement I'd want if it were mine. Simple design, good UX, nothing in the way.
+      </p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#63615a;line-height:1.8;text-align:right;flex:none;white-space:nowrap">
+        <div style="color:#e7b53a">// currently</div>
+        <div style="color:#adaa9f">Developer @ Buri</div>
+        <div style="color:#adaa9f">building <span style="color:#eceae0">Cast LMS</span></div>
+        <div style="margin-top:4px">{{ time }} PHT</div>
+      </div>
+    </div>
+
+    <div data-reveal style="display:flex;flex-wrap:wrap;gap:13px;margin-top:40px">
+      <a href="#work" data-cursor="hover" style="display:inline-flex;align-items:center;gap:9px;padding:15px 26px;background:#e7b53a;color:#0e0e0d;border-radius:999px;font-weight:600;font-size:15px">See my work →</a>
+      <button onClick="{{ openResume }}" data-cursor="hover" style="display:inline-flex;align-items:center;gap:9px;padding:15px 26px;background:transparent;color:#eceae0;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:15px;font-family:inherit;cursor:none">View résumé</button>
+      <button onClick="{{ openContact }}" data-cursor="hover" style="display:inline-flex;align-items:center;gap:9px;padding:15px 26px;background:transparent;color:#eceae0;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:15px;font-family:inherit;cursor:none">Get in touch</button>
+    </div>
+
+    <div data-reveal style="margin-top:30px;display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#5a584f">
+      <button onClick="{{ toggleLights }}" data-cursor="hover" style="background:transparent;border:0;color:#8f8c81;font-family:inherit;font-size:inherit;cursor:none;padding:0">{{ lightsLabel }}</button>
+      <span style="opacity:.4">·</span>
+      <span>a few things around here react when you poke them</span>
+    </div>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div style="overflow:hidden;border-block:1px solid rgba(255,255,255,.07);padding:16px 0;margin-top:24px;white-space:nowrap">
+  <div style="display:inline-block;animation:marquee 26s linear infinite;font-family:'JetBrains Mono',monospace;font-size:15px;color:#7d7a70">
+    <span style="color:#eceae0">TypeScript</span> ✦ Next.js ✦ <span style="color:#eceae0">SvelteKit</span> ✦ Django ✦ Node.js ✦ <span style="color:#eceae0">Python</span> ✦ C# ✦ React ✦ <span style="color:#eceae0">PostgreSQL</span> ✦ Ruby ✦ Prisma ✦ <span style="color:#eceae0">AWS</span> ✦ Figma ✦&nbsp;
+    <span style="color:#eceae0">TypeScript</span> ✦ Next.js ✦ <span style="color:#eceae0">SvelteKit</span> ✦ Django ✦ Node.js ✦ <span style="color:#eceae0">Python</span> ✦ C# ✦ React ✦ <span style="color:#eceae0">PostgreSQL</span> ✦ Ruby ✦ Prisma ✦ <span style="color:#eceae0">AWS</span> ✦ Figma ✦&nbsp;
+  </div>
+</div>
+
+<!-- WORK -->
+<section id="work" style="max-width:1180px;margin:0 auto;padding:60px 28px">
+  <div data-reveal style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:26px">
+    <h2 style="margin:0;font-size:clamp(30px,4.5vw,46px);font-weight:700;letter-spacing:-.03em">Selected work</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <sc-for list="{{ filters }}" as="f" hint-placeholder-count="5">
+        <button onClick="{{ f.onClick }}" data-cursor="hover" style="{{ f.style }}">{{ f.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- SPOTLIGHT: CAST LMS -->
+  <sc-if value="{{ showSpotlight }}" hint-placeholder-val="{{ true }}">
+  <a href="#work" data-cursor="hover" data-reveal style="display:grid;grid-template-columns:1.1fr .9fr;gap:0;border:1px solid rgba(231,181,58,.32);border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#16160f,#121210);margin-bottom:22px;color:inherit">
+    <div style="padding:34px 34px 30px">
+      <div style="display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#0e0e0d;margin-bottom:18px">
+        <span style="background:#e7b53a;padding:4px 10px;border-radius:999px;font-weight:700">★ SPOTLIGHT</span>
+        <span style="color:#8f8c81">Buri Technologies · 2025 — Present</span>
+      </div>
+      <h3 style="margin:0;font-size:clamp(28px,3.6vw,40px);font-weight:700;letter-spacing:-.03em">Cast LMS</h3>
+      <p style="margin:14px 0 0;font-size:16px;line-height:1.55;color:#c2bfb4;max-width:460px">
+        A learning-management platform I help build and ship at Buri — responsive, reusable UI on SvelteKit backed by Ruby &amp; Django. My focus: turning UX mockups into components that hold up, and keeping training workflows stable for real clients.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:20px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:5px 11px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#b8b5aa">SvelteKit</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:5px 11px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#b8b5aa">Ruby</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:5px 11px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#b8b5aa">Django</span>
+      </div>
+    </div>
+    <div style="position:relative;border-left:1px solid rgba(255,255,255,.07);min-height:250px;background:#4a2f8f;overflow:hidden">
+      <img src="assets/buri-cast.png" alt="Cast LMS" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+    </div>
+  </a>
+  </sc-if>
+
+  <!-- PROJECT GRID -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px">
+    <sc-for list="{{ gridProjects }}" as="p" hint-placeholder-count="5">
+      <div data-cursor="hover" style="position:relative;padding:26px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:#141310;transition:transform .25s,border-color .25s,background .25s" style-hover="transform:translateY(-6px);border-color:rgba(231,181,58,.4);background:#181712">
+        <div style="position:relative;height:158px;border-radius:11px;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin-bottom:18px;background:#0c0c0a">
+          <sc-if value="{{ p.url }}" hint-placeholder-val="{{ noToast }}">
+            <iframe src="{{ p.url }}" loading="lazy" title="{{ p.name }} live preview" scrolling="no" style="position:absolute;top:0;left:0;width:1280px;height:832px;border:0;transform:scale(.25);transform-origin:top left;pointer-events:none;background:#0c0c0a"></iframe>
+            <span style="position:absolute;top:9px;right:9px;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#f3ecd9;background:rgba(6,5,3,.68);border:1px solid rgba(231,181,58,.4);padding:3px 8px;border-radius:6px;pointer-events:none">● live site</span>
+          </sc-if>
+          <sc-if value="{{ p.isAnalog }}" hint-placeholder-val="{{ noToast }}">
+            <div style="position:absolute;inset:0;background-color:#08130f;background-image:linear-gradient(rgba(90,220,170,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(90,220,170,.1) 1px,transparent 1px);background-size:26px 26px">
+              <svg viewBox="0 0 300 158" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%"><path d="M0,79 C25,18 50,140 75,79 S125,18 150,79 S225,140 250,79 S292,28 300,79" fill="none" stroke="#4fe0a8" stroke-width="2"></path></svg>
+              <span style="position:absolute;top:9px;left:10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:#4fe0a8">◠ SIGNAL · ANALOG DEVICES</span>
+              <span style="position:absolute;bottom:9px;left:10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#8f8c81">internal tool — no public demo</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ p.isInvoice }}" hint-placeholder-val="{{ noToast }}">
+            <div style="position:absolute;inset:0;background:#131210;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="width:64px;height:9px;border-radius:2px;background:#e7b53a"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#8f8c81">INVOICE #0042</span></div>
+              <div style="display:flex;justify-content:space-between;gap:12px"><span style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,.14)"></span><span style="width:42px;height:7px;border-radius:2px;background:rgba(231,181,58,.55)"></span></div>
+              <div style="display:flex;justify-content:space-between;gap:12px"><span style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,.1)"></span><span style="width:42px;height:7px;border-radius:2px;background:rgba(231,181,58,.4)"></span></div>
+              <div style="display:flex;justify-content:space-between;gap:12px"><span style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,.1)"></span><span style="width:42px;height:7px;border-radius:2px;background:rgba(231,181,58,.4)"></span></div>
+              <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.1);padding-top:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#8f8c81">private client build</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e7b53a;font-weight:700">₱ TOTAL</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ p.isSlot }}" hint-placeholder-val="{{ noToast }}">
+            <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ p.slot }}" shape="rect" fit="cover" placeholder="{{ p.ph }}" hint-size="100%,158px" style="width:100%;height:100%;position:absolute;inset:0"></x-import>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#e7b53a;border:1px solid rgba(231,181,58,.3);padding:3px 9px;border-radius:999px">{{ p.cat }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6f6d64">{{ p.period }}</span>
+        </div>
+        <h3 style="margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em">{{ p.name }}</h3>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#8f8c81;margin-top:4px">{{ p.role }}</div>
+        <sc-if value="{{ p.url }}" hint-placeholder-val="{{ noToast }}">
+          <a href="{{ p.url }}" target="_blank" rel="noopener" data-cursor="hover" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#e7b53a;border:1px solid rgba(231,181,58,.4);padding:4px 10px;border-radius:999px">● live demo ↗</a>
+        </sc-if>
+        <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:#adaa9f">{{ p.blurb }}</p>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',monospace;font-size:12px;color:#e7b53a">{{ p.metric }}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px">
+          <sc-for list="{{ p.stack }}" as="t" hint-placeholder-count="3">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:4px 9px;background:rgba(255,255,255,.05);border-radius:6px;color:#9a978c">{{ t }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+    <sc-if value="{{ showMore }}" hint-placeholder-val="{{ true }}">
+    <a href="https://github.com/kojicc" target="_blank" rel="noopener" data-cursor="hover" style="display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:12px;padding:26px;border:1.5px dashed rgba(231,181,58,.32);border-radius:16px;background:repeating-linear-gradient(135deg,#131310 0 10px,#141410 10px 20px);color:inherit;min-height:220px;transition:border-color .25s,transform .25s" style-hover="border-color:rgba(231,181,58,.6);transform:translateY(-6px)">
+      <div style="font-size:42px;font-weight:700;color:#e7b53a;line-height:1;animation:float 4s ease-in-out infinite">∞</div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:-.02em">Always building</div>
+      <p style="margin:0;font-size:14px;line-height:1.55;color:#adaa9f">Greenpasture's still growing and there's more on the way. New builds dock here — come back and check.</p>
+      <span style="margin-top:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:#e7b53a">→ github.com/kojicc</span>
+    </a>
+    </sc-if>
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ contactOpen }}">
+    <div data-reveal style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:56px 26px;border:1.5px dashed rgba(231,181,58,.32);border-radius:16px;background:repeating-linear-gradient(135deg,#131310 0 10px,#141410 10px 20px);text-align:center">
+      <div style="font-size:40px;line-height:1;animation:float 4s ease-in-out infinite">🛠️</div>
+      <div style="font-size:22px;font-weight:700;letter-spacing:-.02em">Wait for it…</div>
+      <p style="margin:0;max-width:420px;font-size:14px;line-height:1.55;color:#adaa9f">Side projects live here — the things I build for fun on weekends. Nothing shipped yet, but there's always something half-built on my machine. Check back soon.</p>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#63615a">// loading passion projects...</span>
+    </div>
+    </sc-if>
+  </div>
+</section>
+
+<!-- ABOUT — PROFILE -->
+<section id="about" style="max-width:1180px;margin:0 auto;padding:60px 28px">
+  <div data-reveal style="display:grid;grid-template-columns:320px 1fr;gap:0;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#151410,#100f0d)">
+    <!-- PORTRAIT PANEL -->
+    <div style="position:relative;padding:24px;border-right:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#e7b53a">PROFILE</div>
+      <div style="position:relative;margin-top:16px;border-radius:14px;overflow:hidden;border:1px solid rgba(231,181,58,.28);aspect-ratio:4/5;background:#0c0c0a">
+        <img src="assets/jeiko.png" alt="Jeiko Sy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <div style="position:absolute;left:0;right:0;bottom:0;padding:15px;background:linear-gradient(0deg,rgba(6,5,3,.92),transparent);pointer-events:none">
+          <div style="font-size:22px;font-weight:700;letter-spacing:-.02em;color:#f3ecd9">Jeiko Sy</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#e7b53a;letter-spacing:.04em;margin-top:2px">Full-Stack Developer</div>
+        </div>
+      </div>
+      <div style="margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#7d7a70;line-height:1.9;display:grid;gap:3px">
+        <div style="display:flex;justify-content:space-between;gap:10px"><span>Works at</span><span style="color:#cbc8bd;text-align:right">Buri Technologies</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px"><span>Based in</span><span style="color:#cbc8bd;text-align:right">General Trias, Cavite</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px"><span>Degree</span><span style="color:#cbc8bd;text-align:right">BS IT · 3.79 GPA</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px"><span>Status</span><span style="color:#e7b53a;text-align:right">Open to work</span></div>
+      </div>
+    </div>
+    <!-- BIO + STRENGTHS + PERSONALITY -->
+    <div style="padding:30px 32px">
+      <h2 style="margin:0 0 14px;font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-.03em">A bit about me</h2>
+      <p style="margin:0;font-size:16px;line-height:1.62;color:#c2bfb4;text-wrap:pretty">
+        I'm Jeiko. I build because I like solving problems — I'll see something slow or still done by hand and think, “hey, I can build that.” I tend to do a bit more than what's asked when I spot a way to make it better, and I keep things simple: good UX, clean design, nothing in the way. Off the clock I'm gaming, experimenting in the kitchen, surviving horror games, and finding dogs to bother.
+      </p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:28px">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:#e7b53a;margin-bottom:14px">HOW I WORK</div>
+          <div style="display:grid;gap:12px">
+            <sc-for list="{{ attributes }}" as="a" hint-placeholder-count="5">
+              <div>
+                <div style="font-size:12.5px;color:#adaa9f;margin-bottom:6px">{{ a.label }}</div>
+                <div style="display:flex;gap:4px">
+                  <sc-for list="{{ a.cells }}" as="c" hint-placeholder-count="5">
+                    <span style="flex:1;height:8px;border-radius:2px;background:{{ c.color }}"></span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:#e7b53a;margin-bottom:14px">OFF THE CLOCK — TAP ONE</div>
+          <div style="display:flex;flex-wrap:wrap;gap:9px">
+            <sc-for list="{{ personas }}" as="p" hint-placeholder-count="4">
+              <button onClick="{{ p.onClick }}" data-cursor="hover" style="{{ p.style }}">{{ p.emoji }} {{ p.label }}</button>
+            </sc-for>
+          </div>
+          <div style="margin-top:16px;padding:16px 18px;border:1px solid rgba(231,181,58,.22);border-radius:12px;background:#131210;display:flex;align-items:flex-start;gap:11px;min-height:92px">
+            <span style="font-family:'JetBrains Mono',monospace;color:#e7b53a;font-size:13px;line-height:1.5">›</span>
+            <p style="margin:0;font-size:14.5px;line-height:1.5;color:#eceae0;font-style:italic">{{ personaLine }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE — CONTROL ROOM -->
+<section id="experience" style="max-width:1180px;margin:0 auto;padding:60px 28px">
+  <div data-reveal style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px">
+    <h2 style="margin:0;font-size:clamp(30px,4.5vw,46px);font-weight:700;letter-spacing:-.03em">Where I've been</h2>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#63615a">// control room — tap a camera to switch feed</span>
+  </div>
+  <div data-reveal style="display:grid;grid-template-columns:1fr 244px;gap:16px;align-items:stretch">
+    <!-- MAIN FEED -->
+    <div style="position:relative;border:1px solid rgba(231,181,58,.22);border-radius:16px;overflow:hidden;background:radial-gradient(120% 120% at 50% 45%, #16150f, #080806);min-height:380px;display:flex;flex-direction:column">
+      <div aria-hidden="true" style="position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px)"></div>
+      <div aria-hidden="true" style="position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.07;mix-blend-mode:overlay;background-image:repeating-radial-gradient(rgba(255,255,255,.9) 0 1px, transparent 1px 2px);background-size:3px 3px;animation:noise .45s steps(4) infinite"></div>
+      <div aria-hidden="true" style="position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 120% at 50% 50%, transparent 58%, rgba(4,3,1,.7))"></div>
+      <sc-for list="{{ cams }}" as="c" hint-placeholder-count="0">
+        <div style="position:absolute;inset:0;z-index:0;{{ c.feedDisplay }}">
+          <span aria-hidden="true" style="position:absolute;inset:0;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(48px,10vw,120px);letter-spacing:.03em;color:rgba(231,181,58,.08)">{{ c.mark }}</span>
+          <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ noToast }}">
+            {{ c.imgEl }}
+          </sc-if>
+          <sc-if value="{{ c.noImg }}" hint-placeholder-val="{{ noToast }}">
+            <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ c.feedId }}" shape="rect" fit="cover" placeholder="{{ c.feedPh }}" hint-size="100%,100%" style="width:100%;height:100%;position:absolute;inset:0"></x-import>
+          </sc-if>
+        </div>
+      </sc-for>
+      <!-- HUD top -->
+      <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:16px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;color:#e7b53a">
+        <span>{{ expActive.cam }} · {{ expActive.mark }}</span>
+        <span style="display:flex;align-items:center;gap:7px;color:{{ expActive.recColor }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ expActive.recColor }};animation:recblink 1.4s infinite"></span>REC · {{ expActive.ts }}</span>
+      </div>
+      <!-- detail overlay bottom -->
+      <div style="position:relative;z-index:2;margin-top:auto;padding:22px;background:linear-gradient(0deg, rgba(6,5,3,.92), rgba(6,5,3,.55) 70%, transparent)">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;padding:4px 9px;border-radius:999px;{{ expActive.kindStyle }}">{{ expActive.kind }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e7b53a">{{ expActive.period }}</span>
+        </div>
+        <div style="font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-.02em;margin-top:12px;text-wrap:pretty">{{ expActive.role }}</div>
+        <div style="font-size:13.5px;color:#a8a59a;margin-top:3px">{{ expActive.org }}</div>
+        <p style="margin:12px 0 0;font-size:14.5px;line-height:1.55;color:#c2bfb4;max-width:620px;text-wrap:pretty">{{ expActive.detail }}</p>
+      </div>
+    </div>
+    <!-- CAM RAIL = TIMELINE HIERARCHY -->
+    <div style="display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:#63615a;padding:2px 2px 12px"><span>TIMELINE</span><span style="color:#e7b53a">▲ NOW</span></div>
+      <div style="position:relative">
+        <div aria-hidden="true" style="position:absolute;left:52px;top:8px;bottom:20px;width:2px;background:rgba(255,255,255,.12);z-index:0"></div>
+        <sc-for list="{{ cams }}" as="c" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:10px;padding-bottom:13px">
+            <span style="{{ c.yearStyle }}">{{ c.year }}</span>
+            <span style="position:relative;z-index:1;width:12px;height:12px;flex:none;border-radius:50%;background:{{ c.spineDot }};border:2px solid #0e0e0d"></span>
+            <button onClick="{{ c.onClick }}" data-cursor="hover" style="{{ c.thumbStyle }}">
+              <div style="position:absolute;inset:0;opacity:.45;background:repeating-linear-gradient(0deg,rgba(0,0,0,.3) 0 1px,transparent 1px 3px)"></div>
+              <span style="position:absolute;inset:0;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;letter-spacing:.04em;color:rgba(231,181,58,.22)">{{ c.mark }}</span>
+              <span style="position:absolute;top:6px;left:8px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.06em;color:#cbc8bd">{{ c.cam }}</span>
+              <span style="position:absolute;top:7px;right:8px;width:6px;height:6px;border-radius:50%;background:{{ c.dotColor }}"></span>
+            </button>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#63615a"><span style="width:38px;text-align:right">▼</span><span>START</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section style="max-width:1180px;margin:0 auto;padding:40px 28px 60px">
+  <div data-reveal style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px">
+    <h2 style="margin:0;font-size:clamp(30px,4.5vw,46px);font-weight:700;letter-spacing:-.03em">My loadout</h2>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#63615a">// what I bring to a team</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:22px">
+    <sc-for list="{{ skillGroups }}" as="g" hint-placeholder-count="4">
+      <div data-reveal data-cursor="hover" style="padding:24px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:#141310;transition:transform .25s,border-color .25s,background .25s" style-hover="transform:translateY(-5px);border-color:rgba(231,181,58,.4);background:#181712">
+        <div style="display:flex;align-items:center;gap:13px">
+          <span style="flex:none;width:46px;height:46px;display:grid;place-items:center;border:1px solid rgba(231,181,58,.35);border-radius:12px;font-size:22px;color:#e7b53a;background:rgba(231,181,58,.07)">{{ g.sym }}</span>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:19px;font-weight:700;letter-spacing:-.01em">{{ g.title }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:#0e0e0d;background:#e7b53a;padding:3px 7px;border-radius:999px">{{ g.tag }}</span>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8f8c81;margin-top:3px">LVL {{ g.level }} / 5</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;margin-top:18px">
+          <sc-for list="{{ g.cells }}" as="c" hint-placeholder-count="5">
+            <span style="flex:1;height:10px;border-radius:2px;background:{{ c.color }}"></span>
+          </sc-for>
+        </div>
+        <p style="margin:16px 0 0;font-size:13px;line-height:1.5;color:#8f8c81">{{ g.desc }}</p>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:#63615a;margin-top:20px;margin-bottom:10px">EQUIPPED</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="4">
+            <span data-cursor="hover" style="display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#cbc8bd;padding:6px 11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;transition:all .18s" style-hover="color:#0e0e0d;background:#e7b53a;border-color:#e7b53a;transform:translateY(-2px)"><span style="color:#e7b53a;font-size:9px">◦</span>{{ it }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<!-- HOW I BUILD — PRINCIPLES -->
+<section style="max-width:1180px;margin:0 auto;padding:60px 28px">
+  <div data-reveal style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:26px">
+    <h2 style="margin:0;font-size:clamp(30px,4.5vw,46px);font-weight:700;letter-spacing:-.03em">How I build</h2>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#63615a">// in my own words</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px">
+    <div data-reveal style="padding:26px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:#141310">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e7b53a;letter-spacing:.04em">01</div>
+      <h3 style="margin:14px 0 0;font-size:19px;font-weight:700;letter-spacing:-.02em">I don't stop at the ask</h3>
+      <p style="margin:10px 0 0;font-size:14px;line-height:1.55;color:#9a978c">I do what a project needs — then the improvement I'd want if it were mine. If I spot a better way mid-build, you get it, no extra charge.</p>
+    </div>
+    <div data-reveal style="padding:26px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:#141310">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e7b53a;letter-spacing:.04em">02</div>
+      <h3 style="margin:14px 0 0;font-size:19px;font-weight:700;letter-spacing:-.02em">If it's boring, automate it</h3>
+      <p style="margin:10px 0 0;font-size:14px;line-height:1.55;color:#9a978c">My favorite problems are the tedious, done-by-hand, still-on-paper ones — the stuff software should quietly take off your plate so you can use your head for better things.</p>
+    </div>
+    <div data-reveal style="padding:26px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:#141310">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#e7b53a;letter-spacing:.04em">03</div>
+      <h3 style="margin:14px 0 0;font-size:19px;font-weight:700;letter-spacing:-.02em">Simple wins</h3>
+      <p style="margin:10px 0 0;font-size:14px;line-height:1.55;color:#9a978c">Good UX and a clean, simple design beat clever every time. The best system is the one people barely have to think about.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<footer id="contact" style="border-top:1px solid rgba(255,255,255,.08);margin-top:20px">
+  <div style="max-width:1180px;margin:0 auto;padding:70px 28px">
+    <div data-reveal style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#8f8c81;margin-bottom:14px">// let's build something</div>
+    <h2 data-reveal style="margin:0;font-size:clamp(40px,8vw,96px);font-weight:700;letter-spacing:-.04em;line-height:.95">Say hi.<span style="color:#e7b53a">_</span></h2>
+    <p data-reveal style="margin:18px 0 0;max-width:520px;font-size:16px;line-height:1.55;color:#c2bfb4">Open to <span style="color:#eceae0">full-time roles</span> and <span style="color:#eceae0">freelance builds</span>. Got something tedious, slow, or still done on paper? That's my favorite kind of problem. I'll build you something simple that just works — usually reply within a day.</p>
+    <p data-reveal style="margin:12px 0 0;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#8f8c81">or email me directly at <a href="mailto:syjeikoo@gmail.com" data-cursor="hover">syjeikoo@gmail.com</a></p>
+    <div data-reveal style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8f8c81;padding:7px 13px;border:1px solid rgba(255,255,255,.12);border-radius:999px">Internal tools &amp; dashboards</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8f8c81;padding:7px 13px;border:1px solid rgba(255,255,255,.12);border-radius:999px">Management systems (CMS/LMS)</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8f8c81;padding:7px 13px;border:1px solid rgba(255,255,255,.12);border-radius:999px">Small SaaS &amp; web apps</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8f8c81;padding:7px 13px;border:1px solid rgba(255,255,255,.12);border-radius:999px">Fixed-scope or hourly</span>
+    </div>
+    <div data-reveal style="display:flex;flex-wrap:wrap;gap:14px;margin-top:30px">
+      <button onClick="{{ openContact }}" data-cursor="hover" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;background:#e7b53a;color:#0e0e0d;border:0;border-radius:999px;font-weight:600;font-size:15px;font-family:inherit;cursor:none">✉ Message me</button>
+      <a href="tel:+639763342730" data-cursor="hover" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:15px;color:#eceae0">+63 976 334 2730</a>
+      <a href="https://www.linkedin.com/in/jeiko-emmanuel-sy-7875b932b/" target="_blank" rel="noopener" data-cursor="hover" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:15px;color:#eceae0">LinkedIn ↗</a>
+      <a href="https://github.com/kojicc" target="_blank" rel="noopener" data-cursor="hover" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-weight:600;font-size:15px;color:#eceae0">GitHub ↗</a>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;margin-top:56px;padding-top:22px;border-top:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#63615a">
+      <span>© 2026 Jeiko Emmanuel B. Sy · chasing my own One Piece, one commit at a time <button onClick="{{ strawHat }}" data-cursor="hover" title="go on, click it" style="background:none;border:none;padding:0;font-size:14px;cursor:none;filter:grayscale(.2)">🏴‍☠️</button></span>
+      <span style="display:flex;align-items:center;gap:14px"><a href="https://github.com/kojicc" target="_blank" rel="noopener" data-cursor="hover" style="color:#8f8c81">designed &amp; built by hand, with AI in the loop — code ↗</a><span>General Trias · {{ time }} PHT</span></span>
+    </div>
+  </div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    name: 'JEIKO SY',
+    filter: 'All',
+    lightsOut: false,
+    persona: 0,
+    exp: 0,
+    rot: 0,
+    foxy: false,
+    contactOpen: false,
+    resumeOpen: false,
+    resumeSrc: 'uploads/JeikoSyCV_2025.pdf',
+    dogs: [],
+    zelda: false,
+    toast: '',
+    time: '--:--:--'
+  };
+  rotWords = ['clean systems', 'dependable code', 'good UX', 'clarity', 'systems that last'];
+
+  componentDidMount() {
+    this.tick();
+    this.clock = setInterval(() => this.tick(), 1000);
+    this.initCursor();
+    this.initReveal();
+    this.initCount();
+    this.expTimer = setInterval(() => {
+      if (this.userPickedCam) return;
+      this.setState((s) => ({ exp: (s.exp + 1) % 3 }));
+    }, 3800);
+    this.rotTimer = setInterval(() => {
+      this.setState((s) => ({ rot: (s.rot + 1) % this.rotWords.length }));
+    }, 2400);
+    try {
+      const saved = localStorage.getItem('jeiko-resume-v1');
+      if (saved) this.setResumeFromDataUrl(saved);
+    } catch (e) {}
+  }
+  componentWillUnmount() {
+    clearInterval(this.clock);
+    clearInterval(this.expTimer);
+    clearInterval(this.rotTimer);
+    cancelAnimationFrame(this.raf);
+    window.removeEventListener('mousemove', this.onMove);
+  }
+
+  setCam = (i) => { this.userPickedCam = true; this.setState({ exp: i }); };
+
+  tick() {
+    try {
+      const t = new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Manila', hour12: false });
+      this.setState({ time: t });
+    } catch (e) {}
+  }
+
+  initCursor() {
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    const ov = document.getElementById('lights-overlay');
+    if (!dot || !ring) return;
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2, rx = mx, ry = my, shown = false;
+    this.onMove = (e) => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px,${my}px)`;
+      if (!shown) { dot.style.opacity = '1'; ring.style.opacity = '1'; shown = true; }
+      if (ov) { ov.style.setProperty('--mx', mx + 'px'); ov.style.setProperty('--my', my + 'px'); }
+      const hov = e.target && e.target.closest && e.target.closest('[data-cursor="hover"]');
+      if (hov) { ring.style.width = '54px'; ring.style.height = '54px'; ring.style.margin = '-27px 0 0 -27px'; ring.style.background = 'rgba(231,181,58,.18)'; }
+      else { ring.style.width = '34px'; ring.style.height = '34px'; ring.style.margin = '-17px 0 0 -17px'; ring.style.background = 'transparent'; }
+    };
+    window.addEventListener('mousemove', this.onMove);
+    const loop = () => { rx += (mx - rx) * 0.2; ry += (my - ry) * 0.2; ring.style.transform = `translate(${rx}px,${ry}px)`; this.raf = requestAnimationFrame(loop); };
+    loop();
+  }
+
+  initReveal() {
+    const els = Array.from(document.querySelectorAll('[data-reveal]'));
+    els.forEach((el) => { el.style.opacity = '0'; el.style.transform = 'translateY(22px)'; el.style.transition = 'opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1)'; });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { en.target.style.opacity = '1'; en.target.style.transform = 'none'; io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    els.forEach((el) => io.observe(el));
+  }
+
+  initCount() {
+    const els = Array.from(document.querySelectorAll('[data-count]'));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        const el = en.target; io.unobserve(el);
+        const target = parseFloat(el.getAttribute('data-count'));
+        const suffix = el.getAttribute('data-suffix') || '';
+        const dec = String(target).includes('.') ? 1 : 0;
+        const start = performance.now(), dur = 1400;
+        const step = (now) => {
+          const p = Math.min(1, (now - start) / dur);
+          const e = 1 - Math.pow(1 - p, 3);
+          el.textContent = (target * e).toFixed(dec) + suffix;
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.4 });
+    els.forEach((el) => io.observe(el));
+  }
+
+  scramble = () => {
+    const target = 'JEIKO SY';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@';
+    let frame = 0;
+    clearInterval(this.scrambleTimer);
+    this.scrambleTimer = setInterval(() => {
+      const out = target.split('').map((ch, i) => {
+        if (ch === ' ') return ' ';
+        if (i < frame / 2) return ch;
+        return chars[Math.floor(Math.random() * chars.length)];
+      }).join('');
+      this.setState({ name: out });
+      frame++;
+      if (frame / 2 > target.length) { clearInterval(this.scrambleTimer); this.setState({ name: target }); }
+    }, 40);
+  };
+
+  toggleLights = () => {
+    const next = !this.state.lightsOut;
+    const ov = document.getElementById('lights-overlay');
+    const ghost = document.getElementById('ghost');
+    if (ov) {
+      ov.style.opacity = next ? '1' : '0';
+      ov.style.animation = next ? 'flick 4s infinite' : 'none';
+    }
+    if (ghost) {
+      if (next) {
+        ghost.style.left = (55 + Math.random() * 28) + '%';
+        ghost.style.top = (26 + Math.random() * 30) + '%';
+        ghost.style.opacity = '0.85';
+        ghost.style.animation = 'creep 3.5s ease-in-out infinite';
+      } else {
+        ghost.style.opacity = '0';
+        ghost.style.animation = 'none';
+      }
+    }
+    this.setState({ lightsOut: next });
+  };
+
+  rain(set) {
+    const items = Array.from({ length: 30 }, (_, i) => ({
+      id: 'r' + Date.now() + i,
+      left: Math.random() * 96 + 'vw',
+      dur: (2.4 + Math.random() * 2.4).toFixed(2) + 's',
+      delay: (Math.random() * 1.6).toFixed(2) + 's',
+      emoji: set[Math.floor(Math.random() * set.length)]
+    }));
+    this.setState({ dogs: items });
+    clearTimeout(this.dogTimer);
+    this.dogTimer = setTimeout(() => this.setState({ dogs: [] }), 6800);
+  }
+  dogRain = () => this.rain(['🐕', '🐶', '🦮', '🐩', '🐾', '🦴']);
+  strawHat = () => { this.rain(['👒', '🏴‍☠️', '🍖', '⚓', '👒', '👒']); this.showToast('The One Piece is real. 🏴‍☠️'); };
+  showToast = (msg) => { this.setState({ toast: msg }); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 2800); };
+  zeldaSecret = (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ zelda: true }); };
+  closeZelda = () => this.setState({ zelda: false });
+
+  foxyScare = () => {
+    clearTimeout(this.foxyTimer);
+    this.setState({ foxy: true });
+    this.foxyTimer = setTimeout(() => this.setState({ foxy: false }), 1150);
+  };
+
+  openContact = () => this.setState({ contactOpen: true });
+  closeContact = () => this.setState({ contactOpen: false });
+  openResume = () => this.setState({ resumeOpen: true });
+  closeResume = () => this.setState({ resumeOpen: false });
+  setResumeFromDataUrl = (dataUrl) => {
+    try {
+      fetch(dataUrl).then((r) => r.blob()).then((b) => {
+        const u = URL.createObjectURL(b);
+        this.setState({ resumeSrc: u });
+      });
+    } catch (e) {}
+  };
+  onResumeFile = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') { this.flashToast('please pick a PDF'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      try { localStorage.setItem('jeiko-resume-v1', dataUrl); } catch (err) { this.flashToast('file too big to save on device'); }
+      this.setResumeFromDataUrl(dataUrl);
+      this.flashToast('résumé updated on this device ✓');
+    };
+    reader.readAsDataURL(file);
+  };
+  flashToast = (msg) => {
+    this.setState({ toast: msg });
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 1800);
+  };
+  sendMessage = () => {
+    const g = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    const name = g('cf-name'), email = g('cf-email'), msg = g('cf-msg');
+    if (!msg) { this.flashToast('add a message first ✍️'); return; }
+    const subject = encodeURIComponent(name ? ('Portfolio inquiry — ' + name) : 'Portfolio inquiry');
+    const body = encodeURIComponent(msg + '\n\n— ' + (name || 'someone') + (email ? ' · ' + email : ''));
+    window.location.href = 'mailto:syjeikoo@gmail.com?subject=' + subject + '&body=' + body;
+    this.flashToast('opening your email app…');
+  };
+  bookCall = () => {
+    window.open('https://calendly.com/syjeikoo/new-meeting', '_blank', 'noopener');
+  };
+  copyEmail = () => {
+    try { navigator.clipboard.writeText('syjeikoo@gmail.com'); this.flashToast('email copied ✓'); } catch (e) { this.flashToast('syjeikoo@gmail.com'); }
+  };
+
+  renderVals() {
+    const accent = '#e7b53a';
+    const filterList = ['All', 'Work', 'Academic', 'Freelance', 'Side'];
+    const filters = filterList.map((label) => ({
+      label,
+      onClick: () => this.setState({ filter: label }),
+      style: `font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 14px;border-radius:999px;cursor:none;transition:all .2s;border:1px solid ${this.state.filter === label ? accent : 'rgba(255,255,255,.14)'};background:${this.state.filter === label ? accent : 'transparent'};color:${this.state.filter === label ? '#0e0e0d' : '#b8b5aa'};font-weight:${this.state.filter === label ? 700 : 500}`
+    }));
+
+    const projects = [
+      { name: 'Greenpasture', slot: 'prev-green', cat: 'Freelance', period: '2025 — Present', role: 'Clinic Management System', url: 'https://greenpastureclinic.com/', ph: 'drop a Greenpasture screenshot', blurb: 'My first time owning a CMS end-to-end — a clinic management system that helps clinics run their day-to-day, from patients to daily operations.', metric: 'First solo system ownership', stack: ['Full-stack', 'CMS', 'Web'] },
+      { name: 'Reservoia', slot: 'prev-res', cat: 'Academic', period: 'Oct 2024 — Jan 2025', role: 'Capstone Lead / Full-Stack', url: 'https://capstoners.vercel.app/', ph: 'drop a Reservoia screenshot', blurb: 'Hotel reservation & inventory system with real-time booking validation and an admin dashboard. Led the team as project leader.', metric: '↓ 30% booking errors · ↑ 40% response time', stack: ['Django', 'Next.js', 'PostgreSQL'] },
+      { name: 'PRIMA', slot: 'prev-prima', preview: 'analog', cat: 'Work', period: 'Feb — May 2025', role: 'SWE Intern @ Analog Devices', ph: 'internal tool — no public demo', blurb: 'A C# automation tool streaming 90+ daily request entries through parallel routing logic, cutting cross-team bottlenecks.', metric: '↑ 57.5% processing · ↓ 64% bottlenecks', stack: ['C#', '.NET', 'Automation'] },
+      { name: 'Invoice-App', slot: 'prev-invoice', preview: 'invoice', cat: 'Freelance', period: 'Feb — May 2025', role: 'Full-Stack (Freelance)', ph: 'drop an Invoice-App screenshot', blurb: 'Invoicing system with PDF exports, recurring billing and role-based access — zero unauthorized access in testing.', metric: '↓ ~70% manual invoicing effort', stack: ['Node.js', 'PostgreSQL', 'JWT / OAuth2'] },
+      { name: 'Pa-ya-ba', slot: 'prev-payaba', cat: 'Freelance', period: 'Dec 2024 — Feb 2025', role: 'Full-Stack', url: 'https://kurt-capstone-prx1.vercel.app/', ph: 'drop a Pa-ya-ba screenshot', blurb: 'E-commerce inventory system with automated stock sync, low-stock alerts and SMTP order notifications for admins.', metric: '↓ ~60% manual checks · ↑ 35% fulfillment', stack: ['Next.js', 'Django', 'SMTP'] }
+    ].map((p) => ({ ...p, noUrl: !p.url, isAnalog: p.preview === 'analog', isInvoice: p.preview === 'invoice', isSlot: !p.url && !p.preview }));
+    const gridProjects = this.state.filter === 'All' ? projects : projects.filter((p) => p.cat === this.state.filter);
+    const showSpotlight = this.state.filter === 'All' || this.state.filter === 'Work';
+    const showMore = this.state.filter === 'All';
+    const isEmpty = gridProjects.length === 0;
+
+    const stats = [
+      { value: 57.5, suffix: '%', label: 'faster internal processing — PRIMA @ Analog Devices' },
+      { value: 30, suffix: '%', label: 'fewer booking errors — Reservoia capstone' },
+      { value: 70, suffix: '%', label: 'less manual effort — Invoice-App' },
+      { value: 60, suffix: '%', label: 'fewer manual stock checks — Pa-ya-ba' }
+    ];
+
+    const personaData = [
+      { emoji: '🎮', label: 'Gamer', line: "“I think in systems because I’ve min-maxed enough of them.”" },
+      { emoji: '👻', label: 'Horror fan', line: "“Scared the whole time — still hits play. Try the ‘lights out’ button. 😅”" },
+      { emoji: '🍳', label: 'Cook', line: "“I experiment with food the way I experiment with code — a little chaos, mostly delicious.”" },
+      { emoji: '🐕', label: 'Dog person', line: "“Ask me about dogs. Please — go on, click this chip again. 🐾”" }
+    ];
+    const attributes = [
+      { label: 'Reliability', level: 5 },
+      { label: 'Curiosity', level: 5 },
+      { label: 'Adaptability', level: 4 },
+      { label: 'Attention to detail', level: 4 },
+      { label: 'Communication', level: 4 }
+    ].map((a) => ({ label: a.label, cells: [1, 2, 3, 4, 5].map((n) => ({ color: n <= a.level ? '#e7b53a' : 'rgba(255,255,255,.12)' })) }));
+    const personas = personaData.map((p, i) => ({
+      emoji: p.emoji, label: p.label,
+      onClick: () => { this.setState({ persona: i }); if (p.label === 'Dog person') this.dogRain(); if (p.label === 'Horror fan') this.foxyScare(); },
+      style: `display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;padding:10px 16px;border-radius:999px;cursor:none;transition:all .2s;border:1px solid ${this.state.persona === i ? accent : 'rgba(255,255,255,.14)'};background:${this.state.persona === i ? accent : 'transparent'};color:${this.state.persona === i ? '#0e0e0d' : '#cbc8bd'}`
+    }));
+
+    const timeline = [
+      { cam: 'CAM 03', mark: 'BURI', img: 'assets/buri-cast.png', ts: 'NOW', year: 'NOW', kind: 'FULL-TIME', active: true, slot: 'exp-buri', ph: 'drop a Buri photo', period: 'Aug 2025 — Present', role: 'Junior Full-Stack Software Developer', org: 'Buri Technologies Inc. · Quezon City', detail: 'Shipping Cast LMS and custom e-learning platforms on SvelteKit with Ruby & Django backends.' },
+      { cam: 'CAM 02', mark: 'ADI', img: 'assets/adi.png', ts: '2025', year: '2025', kind: 'INTERNSHIP', active: false, slot: 'exp-adi', ph: 'drop an ADI photo', period: 'Feb — May 2025', role: 'Software Engineer Intern', org: 'Analog Devices Inc. · Cavite', detail: 'Built PRIMA, a C# automation tool that sped up internal request processing by 57.5%.' },
+      { cam: 'CAM 01', mark: 'DLSU-D', img: 'assets/dlsu.png', ts: '2021', year: '2021', kind: 'EDUCATION', active: false, slot: 'exp-dlsu', ph: 'drop a DLSU-D photo', period: '2021 — 2025', role: 'BS Information Technology · 3.79 GPA', org: 'DLSU-Dasmariñas · Dean\'s Lister', detail: 'Graduated with honors, focused on full-stack development and system architecture.' }
+    ].map((t) => ({ ...t, dot: t.active ? '#e7b53a' : 'rgba(255,255,255,.28)', ring: t.active ? '0 0 0 5px rgba(231,181,58,.16)' : 'none', kindStyle: t.active ? 'color:#0e0e0d;background:#e7b53a;border:1px solid #e7b53a' : 'color:#cbc8bd;border:1px solid rgba(231,181,58,.3);background:transparent', recColor: t.active ? '#e14b3a' : '#6f6d64' }));
+
+    const skillGroups = [
+      { title: 'Frontend', tag: 'MAIN', sym: '▤', level: 5, desc: 'Interfaces that feel fast and look right — from mockup to reusable component.', items: ['SvelteKit', 'Next.js', 'React', 'TypeScript'] },
+      { title: 'Backend', tag: 'CORE', sym: '⛁', level: 4, desc: 'APIs, data, and the logic that has to be correct every single time.', items: ['Django', 'Node.js', 'Ruby', 'PostgreSQL'] },
+      { title: 'AI-assisted', tag: 'EDGE', sym: '✦', level: 4, desc: 'I build with AI in the loop — scaffolding, reviewing, and shipping faster without losing the plot on what the code actually does.', items: ['Claude', 'Codex', 'Gemini', 'Copilot'] },
+      { title: 'Foundations', tag: 'RANGE', sym: '⬡', level: 4, desc: 'The fundamentals I lean on when a problem needs more than a framework.', items: ['Python', 'C#', 'System Design', 'JWT / OAuth', 'AWS'] }
+    ].map((g) => ({ ...g, cells: [1, 2, 3, 4, 5].map((n) => ({ color: n <= g.level ? '#e7b53a' : 'rgba(255,255,255,.12)' })) }));
+
+    return {
+      name: this.state.name,
+      time: this.state.time,
+      rotWord: this.rotWords[this.state.rot],
+      scramble: this.scramble,
+      toggleLights: this.toggleLights,
+      lightsLabel: this.state.lightsOut ? '💡 lights on' : '🔦 lights out',
+      filters,
+      gridProjects,
+      showSpotlight,
+      showMore,
+      isEmpty,
+      contactOpen: this.state.contactOpen,
+      openContact: this.openContact,
+      closeContact: this.closeContact,
+      sendMessage: this.sendMessage,
+      bookCall: this.bookCall,
+      copyEmail: this.copyEmail,
+      stopProp: (e) => e.stopPropagation(),
+      resumeOpen: this.state.resumeOpen,
+      openResume: this.openResume,
+      closeResume: this.closeResume,
+      onResumeFile: this.onResumeFile,
+      resumeSrc: this.state.resumeSrc,
+      resumeEl: React.createElement('iframe', { src: this.state.resumeSrc, title: 'Résumé preview', style: { width: '100%', height: '68vh', border: 0, borderRadius: '10px', background: '#fff' } }),
+      stats,
+      personas,
+      attributes,
+      personaLine: personaData[this.state.persona].line,
+      timeline,
+      expActive: timeline[this.state.exp] || timeline[0],
+      cams: timeline.map((t, i) => ({
+        cam: t.cam, mark: t.mark, role: t.role, year: t.year, org: t.org, sel: i === this.state.exp,
+        onClick: () => this.setCam(i),
+        feedId: 'feed-' + i,
+        feedPh: 'drop a ' + t.mark + ' photo',
+        img: t.img || '',
+        hasImg: !!t.img,
+        noImg: !t.img,
+        imgEl: t.img ? React.createElement('img', { src: t.img, alt: t.mark, style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(.15) contrast(1.05) brightness(.82)' } }) : null,
+        feedDisplay: i === this.state.exp ? 'display:block' : 'display:none',
+        yearStyle: `font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;width:38px;flex:none;text-align:right;color:${i === this.state.exp ? '#e7b53a' : '#6f6d64'}`,
+        thumbStyle: `position:relative;flex:1;min-width:0;height:60px;border-radius:9px;overflow:hidden;cursor:none;text-align:left;padding:0;background:radial-gradient(120% 120% at 50% 40%, #16150f, #0a0a08);border:1px solid ${i === this.state.exp ? '#e7b53a' : 'rgba(255,255,255,.1)'};transition:border-color .2s,transform .2s;${i === this.state.exp ? 'box-shadow:0 0 0 3px rgba(231,181,58,.14)' : ''}`,
+        dotColor: i === this.state.exp ? '#e14b3a' : '#54524b',
+        spineDot: i === this.state.exp ? '#e7b53a' : 'rgba(255,255,255,.3)'
+      })),
+      skillGroups,
+      dogs: this.state.dogs,
+      zelda: this.state.zelda,
+      foxy: this.state.foxy,
+      toast: this.state.toast,
+      noToast: false,
+      closeZelda: this.closeZelda,
+      zeldaSecret: this.zeldaSecret,
+      strawHat: this.strawHat
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -139,7 +139,17 @@
      gold accent. The runtime serializes colors as rgb(), so we match on that.
      Toggled via `lm` on <body> (survives the component's re-renders). */
   body.lm{ background:#eceae0; }
-  body.lm #pf-root{ filter:invert(1) hue-rotate(180deg); }
+  /* Invert only the CONTENT blocks — never #pf-root itself. A filter on
+     #pf-root would make it the containing block for its position:fixed
+     descendants (the custom cursor, overlays and modals), breaking them on
+     desktop. Filtering each content block instead leaves those untouched and
+     keeps the sticky nav working. */
+  body.lm #pf-root > nav,
+  body.lm #pf-root > header,
+  body.lm #pf-root > section,
+  body.lm #pf-root > footer,
+  body.lm #pf-root > div[style*="border-block"]{ filter:invert(1) hue-rotate(180deg); }
+  /* re-invert media + gold accent so they keep their real colors */
   body.lm #pf-root img,
   body.lm #pf-root iframe,
   body.lm #pf-root [style*="rgb(231, 181, 58)"],
@@ -147,11 +157,12 @@
 
   /* the floating theme toggle lives outside #pf-root so it isn't inverted */
   #theme-toggle{
-    position:fixed; right:16px; bottom:16px; z-index:10001;
-    width:46px; height:46px; border-radius:50%;
-    border:1px solid rgba(231,181,58,.5); background:#e7b53a; color:#0e0e0d;
-    font-size:20px; line-height:1; cursor:pointer; display:grid; place-items:center;
-    box-shadow:0 8px 24px rgba(0,0,0,.35); transition:transform .15s;
+    position:fixed; right:18px; z-index:10001;
+    bottom:calc(18px + env(safe-area-inset-bottom, 0px)); /* clear mobile browser bars */
+    width:50px; height:50px; border-radius:50%;
+    border:2px solid #0e0e0d; background:#e7b53a; color:#0e0e0d;
+    font-size:22px; line-height:1; cursor:pointer; display:grid; place-items:center;
+    box-shadow:0 6px 20px rgba(0,0,0,.4); transition:transform .15s;
   }
   #theme-toggle:hover{ transform:scale(1.08); }
 </style>

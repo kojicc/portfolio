@@ -1055,6 +1055,19 @@ class Component extends DCLogic {
   var scripted = false;    // flips true if the AI backend is unavailable
   var els = {};
 
+  // Jeiko's a One Piece degenerate. A mix of real-ish facts and unhinged fan theories.
+  var onePiece = [
+    "🏴‍☠️ Oda said One Piece would wrap in 5 years. That was 1997. We are all Nico Robin now, just trying to live to see the ending.",
+    "Batshit theory: the One Piece is basically Joy Boy's apology note + a party invite. 1000+ chapters building to the world's biggest group hug. And honestly? I'm in.",
+    "Theory: Blackbeard's whole 'never sleeps' thing + holding two Devil Fruits = the man has more than one soul crammed in there. Walking rule violation, love that for him.",
+    "Theory: Im is the last ruler of the Ancient Kingdom, kept alive for 800 years, and the 'Century of Void' the Gov erased is just the receipts of them losing.",
+    "Nika / Gear 5 being the fruit the Government feared for 800 years means the 'Sun God' liberation myth is literally coded into every slave's hope. Oda cooked.",
+    "Wild one: Shanks sharing the Figarland bloodline with the Holy Knights means he's playing both sides of the whole war. Man handed a kid a hat and rewired the plot.",
+    "Real fact: every Straw Hat's dream is tied to a place except Luffy's — his dream is people. So the 'One Piece is the friends we made' bit is exactly the troll Oda would pull.",
+    "Theory: the Ancient Weapons (Pluton, Poseidon, Uranus) aren't ships and fish — they're checks and balances, and the World Government's terror is that someone will finally use them right."
+  ];
+  var op = function () { return onePiece[Math.floor(Math.random() * onePiece.length)]; };
+
   // Scripted fallback brain — cheeky canned replies in Jeiko's voice, used
   // when there's no AI (no API key / no credits). Keyword matched.
   function scriptedReply(t) {
@@ -1070,7 +1083,8 @@ class Component extends DCLogic {
     if (has('resume', 'cv', 'curriculum vitae')) return "Résumé's the 'résumé' button up top — or the secret one if you click around. It's a PDF, no strings.";
     if (has('contact', 'email', 'reach', 'connect', 'linkedin', 'github', 'message him', 'talk to')) return "Email syjeikoo@gmail.com, or LinkedIn (Jeiko Emmanuel Sy) / GitHub (kojicc). He usually replies within a day.";
     if (has('who are you', 'what are you', 'are you real', 'are you a bot', 'slaive', 'your name')) return "I'm Jeiko's slAIve — his stand-in bot. Currently in budget mode (no AI credits), so you get my greatest scripted hits instead.";
-    if (has('one piece', 'anime', 'game', 'dog', 'horror', 'cook', 'hobb', 'fun')) return "Off the clock it's gaming, horror games (badly), cooking, dogs, and chasing his One Piece. Poke the easter eggs on this page.";
+    if (has('one piece', 'onepiece', 'luffy', 'zoro', 'joy boy', 'gear 5', 'gear five', 'nika', 'poneglyph', 'theory', 'spoiler', 'straw hat', 'gum gum', 'shanks', 'blackbeard', 'void century', 'gorosei', 'oda')) return op();
+    if (has('anime', 'game', 'dog', 'horror', 'cook', 'hobb', 'fun', 'off the clock')) return "Off the clock it's gaming, horror games (badly), cooking, dogs, and chasing his One Piece. Ask me for a One Piece theory if you're brave. Also — poke the easter eggs on this page.";
     if (has('thank', 'appreciate')) return "Anytime. Now go hit that 'Get in touch' button, yeah?";
     if (/\b(hi|hey+|hello|hiya|howdy|yo|sup|good morning|good afternoon|good evening)\b/.test(t)) return "Hey. Running on vibes and canned lines today, but I can still point you around — work, skills, résumé, or how to reach Jeiko?";
     return "My scripted brain only covers the hits: his work, skills, résumé, and how to reach him. Try one of those — or just email syjeikoo@gmail.com.";
@@ -1094,7 +1108,7 @@ class Component extends DCLogic {
   function chips() {
     var row = document.createElement('div');
     row.style.cssText = 'display:flex;flex-wrap:wrap;gap:7px;margin:6px 2px 2px';
-    ['Are you actually good?', 'What can you build?', 'Roast me'].forEach(function (t) {
+    ['Are you actually good?', 'What can you build?', 'Roast me', 'One Piece theory'].forEach(function (t) {
       var c = document.createElement('button');
       c.textContent = t;
       c.style.cssText = "font-family:'JetBrains Mono',monospace;font-size:11px;color:" + ACCENT + ';background:transparent;border:1px solid rgba(231,181,58,.4);border-radius:999px;padding:5px 10px;cursor:pointer';

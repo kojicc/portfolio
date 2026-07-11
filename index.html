@@ -1043,5 +1043,157 @@ class Component extends DCLogic {
   else init();
 })();
 </script>
+
+<!-- AI chatter. Talks to /api/chat (a serverless function that holds the API
+     key server-side). Lives outside #pf-root so it isn't inverted in light
+     mode and stays fixed to the viewport. -->
+<script>
+(function () {
+  var ACCENT = '#e7b53a', INK = '#0e0e0d', PANEL = '#141310', TXT = '#eceae0', MUT = '#8f8c81';
+  var history = [];        // {role, content}
+  var busy = false;
+  var scripted = false;    // flips true if the AI backend is unavailable
+  var els = {};
+
+  // Scripted fallback brain — cheeky canned replies in Jeiko's voice, used
+  // when there's no AI (no API key / no credits). Keyword matched.
+  function scriptedReply(t) {
+    t = (t || '').toLowerCase();
+    var has = function () { for (var i = 0; i < arguments.length; i++) if (t.indexOf(arguments[i]) > -1) return true; return false; };
+    if (has('hi', 'hello', 'hey', 'yo', 'sup')) return "Hey. Running on vibes and canned lines today, but I can still point you around. What do you need?";
+    if (has('roast')) return "You scrolled to the bottom of a portfolio to talk to a bot. We both have questions about our life choices. Anyway — wanna see the work?";
+    if (has('hire', 'hiring', 'recruit', 'available', 'open to work', 'job', 'role', 'position')) return "Recruiter energy, respect. Yes, Jeiko's open — full-time or freelance. Grab the résumé up top or email syjeikoo@gmail.com before someone else does.";
+    if (has('skill', 'stack', 'tech', 'language', 'framework', 'build', 'can you', 'what do you do')) return "Full-stack: SvelteKit, Next.js, React, TypeScript up front; Django, Node, Ruby, PostgreSQL out back. Turns slow, done-by-hand stuff into software. Scroll up to 'My loadout'.";
+    if (has('project', 'work', 'portfolio', 'demo', 'built', 'made')) return "Cast LMS at Buri, a C# tool at Analog Devices that shaved ~57% off request processing, plus freelance builds (clinic system, hotel booking, invoicing, e-commerce). It's all in 'Selected work' above.";
+    if (has('resume', 'cv', 'curriculum')) return "Résumé's the 'résumé' button up top — or the secret one if you click around. It's a PDF, no strings.";
+    if (has('contact', 'email', 'reach', 'message', 'talk', 'connect', 'linkedin', 'github')) return "Email syjeikoo@gmail.com, or LinkedIn (Jeiko Emmanuel Sy) / GitHub (kojicc). He usually replies within a day.";
+    if (has('who are you', 'what are you', 'are you real', 'bot')) return "Jeiko's stand-in bot. Currently in budget mode — no AI credits — so you get my greatest scripted hits instead.";
+    if (has('one piece', 'anime', 'game', 'dog', 'horror', 'cook')) return "Off the clock it's gaming, horror games (badly), cooking, dogs, and chasing his One Piece. Poke the easter eggs on this page.";
+    if (has('thanks', 'thank you', 'ty', 'nice', 'cool')) return "Anytime. Now go hit that 'Get in touch' button, yeah?";
+    return "My scripted brain only covers the hits: his work, skills, résumé, and how to reach him. Try one of those — or just email syjeikoo@gmail.com.";
+  }
+
+  function bubble(role, text) {
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;margin:8px 0;' + (role === 'user' ? 'justify-content:flex-end' : 'justify-content:flex-start');
+    var b = document.createElement('div');
+    b.style.cssText = 'max-width:82%;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word;' +
+      (role === 'user'
+        ? 'background:' + ACCENT + ';color:' + INK + ';border-bottom-right-radius:4px;font-weight:500'
+        : 'background:rgba(255,255,255,.06);color:' + TXT + ';border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:4px');
+    b.textContent = text;
+    wrap.appendChild(b);
+    els.log.appendChild(wrap);
+    els.log.scrollTop = els.log.scrollHeight;
+    return b;
+  }
+
+  function chips() {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;flex-wrap:wrap;gap:7px;margin:6px 2px 2px';
+    ['Are you actually good?', 'What can you build?', 'Roast me'].forEach(function (t) {
+      var c = document.createElement('button');
+      c.textContent = t;
+      c.style.cssText = "font-family:'JetBrains Mono',monospace;font-size:11px;color:" + ACCENT + ';background:transparent;border:1px solid rgba(231,181,58,.4);border-radius:999px;padding:5px 10px;cursor:pointer';
+      c.onclick = function () { row.remove(); send(t); };
+      row.appendChild(c);
+    });
+    els.log.appendChild(row);
+  }
+
+  async function send(text) {
+    if (busy) return;
+    text = (text || els.input.value).trim();
+    if (!text) return;
+    els.input.value = '';
+    busy = true; els.send.disabled = true;
+    bubble('user', text);
+    history.push({ role: 'user', content: text });
+
+    // Already in scripted mode? Skip the network, answer locally.
+    if (scripted) {
+      var s = scriptedReply(text);
+      bubble('bot', s);
+      history.push({ role: 'assistant', content: s });
+      busy = false; els.send.disabled = false; els.input.focus();
+      return;
+    }
+
+    var typing = bubble('bot', '…');
+    try {
+      var r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ messages: history })
+      });
+      var data = await r.json();
+      if (!r.ok) throw new Error((data && data.error) || 'error');
+      typing.textContent = data.reply;
+      history.push({ role: 'assistant', content: data.reply });
+    } catch (e) {
+      // AI is unavailable (no key, no credits, or unreachable) -> drop into
+      // scripted mode for the rest of the session.
+      scripted = true;
+      typing.textContent = 'me ai no credits. cool cool cool, no doubt no doub no doubt';
+      var reply = scriptedReply(text);
+      var late = bubble('bot', reply);
+      history.push({ role: 'assistant', content: reply });
+    } finally {
+      busy = false; els.send.disabled = false; els.input.focus();
+    }
+  }
+
+  function buildPanel() {
+    var p = document.createElement('div');
+    p.id = 'chat-panel';
+    p.style.cssText = 'position:fixed;left:16px;bottom:74px;z-index:10002;width:min(360px,calc(100vw - 32px));height:min(500px,calc(100vh - 120px));' +
+      'display:none;flex-direction:column;background:' + PANEL + ';border:1px solid rgba(231,181,58,.3);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.55)';
+    p.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)">' +
+        '<div><div style="font-family:\'JetBrains Mono\',monospace;font-size:10.5px;letter-spacing:.1em;color:' + ACCENT + '">// ask the gremlin</div>' +
+        '<div style="font-size:15px;font-weight:700;color:' + TXT + ';margin-top:2px">Jeiko’s AI</div></div>' +
+        '<button id="chat-x" aria-label="Close chat" style="width:30px;height:30px;display:grid;place-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:' + MUT + ';font-size:15px;cursor:pointer">✕</button>' +
+      '</div>' +
+      '<div id="chat-log" style="flex:1;overflow-y:auto;padding:12px 14px"></div>' +
+      '<div style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid rgba(255,255,255,.08)">' +
+        '<input id="chat-input" type="text" autocomplete="off" placeholder="say something…" style="flex:1;padding:10px 13px;background:#0f0e0b;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:' + TXT + ';font-family:inherit;font-size:14px;outline:none">' +
+        '<button id="chat-send" style="padding:0 15px;background:' + ACCENT + ';color:' + INK + ';border:0;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">↑</button>' +
+      '</div>';
+    document.body.appendChild(p);
+    els.panel = p;
+    els.log = p.querySelector('#chat-log');
+    els.input = p.querySelector('#chat-input');
+    els.send = p.querySelector('#chat-send');
+    p.querySelector('#chat-x').onclick = toggle;
+    els.send.onclick = function () { send(); };
+    els.input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); send(); } });
+  }
+
+  function toggle() {
+    if (!els.panel) buildPanel();
+    var open = els.panel.style.display === 'none' || !els.panel.style.display;
+    els.panel.style.display = open ? 'flex' : 'none';
+    if (open && !els.log.childElementCount) {
+      bubble('bot', "Oh look, a visitor. Recruiter? Lost? Bored? I'm Jeiko's bot — ask me what he builds, or don't, I've got nowhere to be.");
+      chips();
+      els.input.focus();
+    }
+  }
+
+  function init() {
+    if (document.getElementById('chat-launch')) return;
+    var btn = document.createElement('button');
+    btn.id = 'chat-launch';
+    btn.setAttribute('aria-label', 'Chat with Jeiko’s AI');
+    btn.textContent = '💬';
+    btn.style.cssText = 'position:fixed;left:18px;z-index:10001;bottom:calc(18px + env(safe-area-inset-bottom,0px));' +
+      'width:50px;height:50px;border-radius:50%;border:2px solid ' + INK + ';background:' + ACCENT + ';font-size:22px;line-height:1;cursor:pointer;' +
+      'display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.4)';
+    btn.onclick = toggle;
+    document.body.appendChild(btn);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
 </body>
 </html>

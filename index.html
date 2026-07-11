@@ -167,6 +167,14 @@
   }
   #theme-toggle:hover{ transform:scale(1.08); }
 
+  /* Cursor theme picker is desktop-only. Hard-hide it on touch devices. */
+  @media (pointer:coarse){ #cursor-fab, #cursor-menu, #cursor-glyph{ display:none !important; } }
+  /* "Default" theme = the real system cursor (the custom gold dot is gone). */
+  @media (pointer:fine){
+    body.cursor-native, body.cursor-native *{ cursor:auto !important; }
+    body.cursor-native a, body.cursor-native button, body.cursor-native label[data-cursor], body.cursor-native [data-cursor="hover"]{ cursor:pointer !important; }
+  }
+
   /* ACCESSIBILITY — lift the darkest caption greys (which failed WCAG AA
      contrast, ~2.8:1 on the dark background) to a legible tone. These hexes
      are only ever used as text colour. Runtime serialises hex to rgb(). */
@@ -1233,17 +1241,18 @@ class Component extends DCLogic {
   function apply(theme) {
     if (!(theme in GLYPH)) theme = 'default';
     current = theme;
+    // The old custom gold cursor is retired — always hide the ring/dot.
     var ring = document.getElementById('cursor-ring'), dot = document.getElementById('cursor-dot');
+    if (ring) ring.style.display = 'none';
+    if (dot) dot.style.display = 'none';
     if (theme === 'default') {
       glyph.style.display = 'none';
-      if (ring) ring.style.visibility = 'visible';
-      if (dot) dot.style.visibility = 'visible';
+      document.body.classList.add('cursor-native');    // real system cursor
     } else {
       glyph.textContent = GLYPH[theme];
       glyph.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
       glyph.style.display = 'block';
-      if (ring) ring.style.visibility = 'hidden';
-      if (dot) dot.style.visibility = 'hidden';
+      document.body.classList.remove('cursor-native');  // hide system cursor, show emoji
     }
     var f = document.getElementById('cursor-fab'); if (f) f.textContent = theme === 'default' ? '✦' : GLYPH[theme];
     [].forEach.call(document.querySelectorAll('#cursor-menu button'), function (b) {

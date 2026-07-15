@@ -50,26 +50,28 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash-latest';
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
-    encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
+  // Try current Gemini flash models in order; model IDs drift over time, so
+  // fall through to the next one whenever a model is unavailable.
+  const candidates = (process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL] : [])
+    .concat(['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-1.5-flash']);
+  const reqBody = JSON.stringify({
+    system_instruction: { parts: [{ text: SYSTEM }] },
+    contents,
+    generationConfig: { maxOutputTokens: 320, temperature: 0.9 },
+  });
 
   try {
-    const upstream = await fetch(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM }] },
-        contents,
-        generationConfig: { maxOutputTokens: 320, temperature: 0.9 },
-      }),
-    });
-
-    const data = await upstream.json();
-    if (!upstream.ok) {
-      res.status(502).json({ error: (data && data.error && data.error.message) || 'Upstream error.' });
-      return;
+    let data = null, ok = false, lastErr = 'Upstream error.';
+    for (const model of candidates) {
+      const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
+        encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
+      const upstream = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: reqBody });
+      data = await upstream.json();
+      if (upstream.ok) { ok = true; break; }
+      lastErr = (data && data.error && data.error.message) || lastErr;
+      if (!/not found|not supported|unknown name|does not exist|unsupported/i.test(lastErr)) break;
     }
+    if (!ok) { res.status(502).json({ error: lastErr }); return; }
     const cand = data.candidates && data.candidates[0];
     const reply = cand && cand.content && Array.isArray(cand.content.parts)
       ? cand.content.parts.map((p) => p.text || '').join('').trim()

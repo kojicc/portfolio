@@ -101,7 +101,7 @@
             </div>
           </sc-for>
         </div>
-        <div class="mono" style="padding:11px 16px;font-size:10px;color:var(--faint);line-height:1.5">Live &amp; anonymized · city from network, updates every ~15s</div>
+        <div class="mono" style="padding:11px 16px;font-size:10px;color:var(--faint);line-height:1.5"><span style="color:var(--ink)">{{ visitorsToday }}</span> visitors today · anonymized · updates every 5s</div>
       </div>
     </div>
   </sc-if>
@@ -295,7 +295,7 @@
   <!-- ===== FOOTER BAR ===== -->
   <div style="border-top:1px solid var(--line);background:var(--nav)">
     <div style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:16px clamp(18px,5vw,60px)">
-      <span class="mono" style="font-size:11.5px;color:var(--faint)">© 2026 Jeiko Sy · Cavite, PH</span>
+      <span class="mono" style="font-size:11.5px;color:var(--faint)">© 2026 Jeiko Sy · Cavite, PH · {{ visitorsToday }} today</span>
       <button onClick="{{ toEgg }}" data-cursor class="mono" style="display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--line2);border-radius:2px;color:var(--mut);font-size:11.5px;cursor:pointer;padding:8px 14px">▚ boot PC-OS →</button>
     </div>
   </div>
@@ -457,7 +457,7 @@ GUIDELINES:
   LIGHT = { '--bg': '#f4f4f2', '--paper': '#ffffff', '--ink': '#0b0b0b', '--mut': '#6a6a67', '--faint': '#a4a49f', '--line': 'rgba(11,11,11,.13)', '--line2': 'rgba(11,11,11,.26)', '--nav': 'rgba(244,244,242,.82)', '--dot': 'rgba(11,11,11,.14)' };
   DARK = { '--bg': '#0c0c0c', '--paper': '#161616', '--ink': '#f3f2ee', '--mut': '#9a9a96', '--faint': '#5e5e59', '--line': 'rgba(243,242,238,.14)', '--line2': 'rgba(243,242,238,.26)', '--nav': 'rgba(12,12,12,.82)', '--dot': 'rgba(243,242,238,.13)' };
 
-  state = { view: 'home', coinDrop: false, paletteOpen: false, resumeOpen: false, menuOpen: false, chat: [], thinking: false, time: '--:--:--', toast: '', isNarrow: false, theme: 'light', presenceOpen: false, viewers: [], viewerCount: 1 };
+  state = { view: 'home', coinDrop: false, paletteOpen: false, resumeOpen: false, menuOpen: false, chat: [], thinking: false, time: '--:--:--', toast: '', isNarrow: false, theme: 'light', presenceOpen: false, viewers: [], viewerCount: 1, visitorsToday: 1 };
 
   VIEW_POOL = [
     { initials: 'AM', loc: 'Manila' }, { initials: 'RC', loc: 'Cebu' }, { initials: 'JT', loc: 'Singapore' },
@@ -515,7 +515,8 @@ GUIDELINES:
     this.konami = []; this.KCODE = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
     try { const th = localStorage.getItem('jeiko-theme'); this.applyTheme(th === 'dark' ? 'dark' : 'light'); } catch (e) { this.applyTheme('light'); }
     this.vid = 'v' + Math.random().toString(36).slice(2, 10);
-    this.heartbeat(); this.hb = setInterval(() => this.heartbeat(), 15000);
+    try { let p = localStorage.getItem('jeiko-visitor'); if (!p) { p = 'p' + Math.random().toString(36).slice(2, 12); localStorage.setItem('jeiko-visitor', p); } this.pid = p; } catch (e) { this.pid = 'p' + Math.random().toString(36).slice(2, 12); }
+    this.heartbeat(); this.hb = setInterval(() => this.heartbeat(), 5000);
   }
   componentDidUpdate() {
     if (this._pc !== this.state.chat || this._pt !== this.state.thinking) { this._pc = this.state.chat; this._pt = this.state.thinking; const b = document.getElementById('fp-askbody'); if (b) b.scrollTop = b.scrollHeight; }
@@ -524,10 +525,10 @@ GUIDELINES:
 
   heartbeat = async () => {
     try {
-      const r = await fetch('/api/presence', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: this.vid, view: this.state.view }) });
+      const r = await fetch('/api/presence', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: this.vid, pid: this.pid, view: this.state.view }) });
       if (!r.ok) throw new Error('bad');
       const d = await r.json();
-      this.setState({ viewers: Array.isArray(d.viewers) ? d.viewers : [], viewerCount: d.count || 1 });
+      this.setState({ viewers: Array.isArray(d.viewers) ? d.viewers : [], viewerCount: d.count || 1, visitorsToday: d.today || this.state.visitorsToday || 1 });
     } catch (e) { this.setState({ viewers: [], viewerCount: 1 }); }
   };
 
@@ -644,7 +645,7 @@ GUIDELINES:
 
     return {
       t: true, f: false,
-      viewers, viewerStack, myDoing, viewerCount: s.viewerCount, viewerOthers: Math.max(0, (s.viewerCount || 1) - 1),
+      viewers, viewerStack, myDoing, viewerCount: s.viewerCount, visitorsToday: s.visitorsToday || 1, viewerOthers: Math.max(0, (s.viewerCount || 1) - 1),
       presenceOpen: s.presenceOpen, togglePresence: this.togglePresence, closePresence: this.closePresence,
       time: s.time, navItems, isNarrow: nar, notNarrow: !nar, menuOpen: s.menuOpen, menuIcon: s.menuOpen ? '✕' : '≡', toggleMenu: this.toggleMenu,
       portraitImgEl, portraitBadge: portrait.badge, portraitEmoji: portrait.emoji, portraitScrim: portrait.scrim, portraitScrimStyle: portrait.scrimStyle,

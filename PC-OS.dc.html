@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:#140f22;color:#eef0e6;font-family:'Space Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+  a{color:var(--lime,#b8f24a)}
+  a:hover{color:#cdff66}
+  ::selection{background:var(--lime,#b8f24a);color:#0e100d}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:rgba(238,240,230,.16);border-radius:6px}
+  image-slot{display:block}
+  .pix{font-family:'Pixelify Sans',system-ui,sans-serif}
+  .mono{font-family:'JetBrains Mono',monospace}
+  @keyframes jbfade{from{opacity:0}to{opacity:1}}
+  @keyframes jbrise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes jbblink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @keyframes jbsweep{0%{transform:translateY(-100%)}100%{transform:translateY(2200%)}}
+  @keyframes jbpulse{0%,100%{opacity:.5}50%{opacity:1}}
+  @keyframes jbled{0%,100%{box-shadow:0 0 0 0 rgba(184,242,74,.6)}70%{box-shadow:0 0 0 6px rgba(184,242,74,0)}}
+  @keyframes jbtrot{from{transform:translateX(-40px)}to{transform:translateX(102vw)}}
+  @keyframes jbflick{0%,100%{opacity:0}10%{opacity:.9}16%{opacity:.1}24%{opacity:.85}40%{opacity:.2}60%{opacity:.7}}
+  @keyframes jbsteam{0%{opacity:0;transform:translateY(2px)}40%{opacity:.7}100%{opacity:0;transform:translateY(-12px)}}
+  @keyframes jbglow{0%,100%{opacity:.5}50%{opacity:.85}}
+  @keyframes jbfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes jbbreathe{0%,100%{transform:translate(-50%,4%)}50%{transform:translate(-50%,5.6%)}}
+</style>
+</helmet>
+
+<div id="jb-root" style="--room1:#241a3e;--room2:#3a2a54;--wall:#20182f;--wallhi:#33254e;--wood:#7c4a28;--wood2:#54300f;--woodhi:#9c6338;--hair:#0e1013;--hoodie:#243b39;--hoodie2:#16211f;--shell:#2b2732;--shell2:#1c1924;--shellhi:#3a3543;--edge:rgba(238,240,230,.1);--edge2:rgba(238,240,230,.18);--screen:#0f120e;--ink:#eef0e6;--mut:#94a086;--faint:#5f6a55;--lime:#b8f24a;--coral:#ff5c49;--violet:#b79cff;--amber:#f2c14e;--sky:#5fd0e0;position:fixed;inset:0;display:grid;place-items:center;padding:clamp(6px,1.6vw,20px);background:radial-gradient(120% 90% at 50% 0%,var(--room2) 0%,var(--room1) 52%,#160f28 100%);overflow:hidden">
+
+  <div aria-hidden="true" style="position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(90% 70% at 50% 30%,rgba(184,242,74,.06),transparent 60%)"></div>
+
+  <!-- ============ 3D STAGE ============ -->
+  <div id="jb-stage" style="position:relative;z-index:2;width:min(1320px,99vw);height:min(892px,96dvh);perspective:1500px;perspective-origin:50% 38%;animation:jbfade .6s ease">
+
+    <!-- BACK WALL (far) -->
+    <div style="position:absolute;left:-10%;top:-10%;width:120%;height:112%;transform:translateZ(-440px);transform-origin:center;z-index:0;border-radius:6px;overflow:hidden;background:linear-gradient(165deg,var(--wallhi),var(--wall))">
+      <image-slot id="pcos-wall" shape="rect" placeholder="drop your workspace photo → becomes the pixel backdrop" style="position:absolute;inset:0;width:100%;height:100%;filter:saturate(.65) brightness(.42) contrast(1.05)"></image-slot>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,26,62,.55),rgba(22,15,40,.78)),radial-gradient(120% 80% at 50% 8%,rgba(95,208,224,.1),transparent 58%)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.22) 0 3px,transparent 3px 6px),linear-gradient(0deg,rgba(0,0,0,.22) 0 3px,transparent 3px 6px);background-size:6px 6px,6px 6px;opacity:.45"></div>
+      <div style="position:absolute;left:8%;top:14%;display:flex;align-items:flex-end;gap:8px;opacity:.85">
+        <span style="width:14px;height:40px;background:var(--coral)"></span>
+        <span style="width:14px;height:50px;background:var(--sky)"></span>
+        <span style="width:14px;height:32px;background:var(--amber)"></span>
+        <span style="width:14px;height:44px;background:var(--violet)"></span>
+        <span class="pix" style="margin-left:6px;font-size:24px">🏆</span>
+      </div>
+      <div style="position:absolute;left:7.5%;top:calc(14% + 54px);width:150px;height:9px;background:var(--wood2)"></div>
+      <div style="position:absolute;right:9%;top:12%;width:200px;height:150px;border:6px solid #14101f;border-radius:4px;overflow:hidden;background:linear-gradient(180deg,#3a2c6a,#7a4a7e 60%,#e08a5a);opacity:.92">
+        <span style="position:absolute;right:24px;top:18px;width:26px;height:26px;border-radius:50%;background:#ffe6b0;box-shadow:0 0 18px rgba(255,230,176,.7)"></span>
+        <span style="position:absolute;left:50%;top:0;bottom:0;width:5px;background:#14101f;transform:translateX(-50%)"></span>
+        <span style="position:absolute;left:0;right:0;top:50%;height:5px;background:#14101f;transform:translateY(-50%)"></span>
+      </div>
+    </div>
+
+    <!-- FLOOR -->
+    <div aria-hidden="true" style="position:absolute;left:-40%;right:-40%;bottom:-4%;height:62%;transform-origin:bottom center;transform:rotateX(77deg);z-index:1;background:linear-gradient(180deg,#241a38 0%,#171026 100%);box-shadow:0 -40px 80px rgba(0,0,0,.5) inset"></div>
+    <div aria-hidden="true" style="position:absolute;left:-40%;right:-40%;bottom:-4%;height:62%;transform-origin:bottom center;transform:rotateX(77deg);z-index:1;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(184,242,74,.05) 0 1px,transparent 1px 74px),repeating-linear-gradient(0deg,rgba(184,242,74,.05) 0 1px,transparent 1px 60px);opacity:.6"></div>
+
+    <!-- DESK slab -->
+    <div aria-hidden="true" style="position:absolute;left:50%;bottom:5%;width:78%;height:24%;transform:translateX(-50%) rotateX(68deg);transform-origin:bottom center;z-index:3;background:linear-gradient(180deg,var(--woodhi),var(--wood) 30%,var(--wood2));border-radius:10px;box-shadow:0 -10px 30px rgba(0,0,0,.4) inset,0 20px 40px rgba(0,0,0,.5)">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 2px,transparent 2px 46px);border-radius:10px"></div>
+    </div>
+
+    <!-- MONITOR (scales in on focus) -->
+    <div style="{{ monitorStyle }}">
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;background:linear-gradient(160deg,var(--shellhi),var(--shell) 42%,var(--shell2));border-radius:16px;padding:clamp(9px,1.2vw,15px);box-shadow:0 2px 0 rgba(255,255,255,.06) inset,0 -14px 34px rgba(0,0,0,.32) inset,0 40px 80px rgba(8,4,18,.6),0 0 60px rgba(184,242,74,.08)">
+        <div style="flex:1;min-height:0;position:relative;border-radius:9px;overflow:hidden;background:#080907;box-shadow:0 0 0 3px #05060455,0 10px 30px rgba(0,0,0,.5) inset">
+          <div style="position:relative;height:100%;background:radial-gradient(130% 130% at 50% 0%,#15180f 0%,var(--screen) 70%);display:flex;flex-direction:column">
+            <div aria-hidden="true" style="position:absolute;inset:0;z-index:5;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px);opacity:.5"></div>
+            <div aria-hidden="true" style="position:absolute;inset:0;z-index:5;pointer-events:none;background:radial-gradient(120% 120% at 50% 45%,transparent 55%,rgba(3,4,2,.6))"></div>
+
+            <!-- HUD -->
+            <div style="flex:none;position:relative;z-index:6;display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--edge);background:rgba(8,10,7,.5)">
+              <span class="pix" style="font-size:12.5px;color:var(--lime);letter-spacing:.02em">{{ hud }}</span>
+              <span class="mono" style="font-size:9.5px;color:var(--faint)">{{ hudSub }}</span>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+                <sc-if value="{{ offHome }}" hint-placeholder-val="{{ f }}">
+                  <button onClick="{{ btnStart }}" data-cursor class="mono" style="display:inline-flex;align-items:center;gap:6px;font-size:9.5px;color:var(--ink);background:rgba(255,255,255,.05);border:1px solid var(--edge2);border-radius:5px;padding:5px 10px;cursor:pointer">⌂ menu</button>
+                </sc-if>
+                <a href="/" data-cursor class="mono" style="display:inline-flex;align-items:center;gap:6px;font-size:9.5px;color:var(--screen);background:var(--lime);border-radius:5px;padding:5px 10px">← back to portfolio</a>
+                <span class="mono" style="display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--lime)"><span style="width:6px;height:6px;border-radius:50%;background:var(--lime);animation:jbpulse 1.6s infinite"></span>OPEN·2·WORK</span>
+                <span class="mono" style="font-size:9.5px;color:var(--mut)">🕑 {{ time }}</span>
+              </div>
+            </div>
+
+            <!-- scroll area -->
+            <div id="jb-scroll" style="flex:1;min-height:0;overflow:auto;position:relative;z-index:6">
+              <div style="padding:clamp(16px,3vw,34px)">
+
+                <!-- HOME / LAUNCHER -->
+                <div style="display:{{ dispHome }};animation:jbfade .4s ease">
+                  <div style="display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(18px,3vw,34px);align-items:start" data-jb-stack>
+                    <div>
+                      <div class="mono" style="font-size:10px;letter-spacing:.2em;color:var(--faint)">NOW SELECTING</div>
+                      <div style="margin-top:12px;border-radius:16px;overflow:hidden;border:1px solid var(--edge2);background:linear-gradient(150deg,#181c12,#0d0f0b)">
+                        <div style="height:8px;background:{{ pv.color }}"></div>
+                        <div style="padding:clamp(16px,2.4vw,24px)">
+                          <div class="mono" style="font-size:10px;letter-spacing:.14em;color:{{ pv.color }}">{{ pv.tag }}</div>
+                          <div class="pix" style="font-size:clamp(26px,4.4vw,44px);font-weight:700;line-height:1;margin-top:8px;letter-spacing:.01em">{{ pv.label }}</div>
+                          <div class="mono" style="font-size:11.5px;color:var(--mut);margin-top:8px">{{ pv.sub }}</div>
+                          <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:var(--ink);text-wrap:pretty">{{ pv.blurb }}</p>
+                          <sc-if value="{{ pv.hasMetric }}" hint-placeholder-val="{{ f }}">
+                            <div class="mono" style="display:inline-block;margin-top:14px;padding:7px 12px;border:1px solid var(--edge2);border-left:2px solid var(--lime);border-radius:8px;font-size:11.5px;color:var(--lime)">▸ {{ pv.metric }}</div>
+                          </sc-if>
+                        </div>
+                      </div>
+                      <div class="pix" style="display:flex;align-items:center;gap:10px;margin-top:14px;font-size:12px;color:var(--faint)">
+                        <span style="color:var(--ink)">Ⓐ</span> LOAD <span style="opacity:.4">·</span> <span style="color:var(--ink)">▲▼</span> BROWSE <span style="opacity:.4">·</span> <span style="color:var(--ink)">SELECT</span> talk
+                      </div>
+                    </div>
+                    <div>
+                      <div class="mono" style="font-size:10px;letter-spacing:.2em;color:var(--faint);margin-bottom:8px">▸ PROJECTS</div>
+                      <div style="display:grid;gap:4px">
+                        <sc-for list="{{ menuCarts }}" as="m" hint-placeholder-count="5">
+                          <button onClick="{{ m.onClick }}" onMouseEnter="{{ m.onHover }}" data-cursor style="{{ m.style }}">
+                            <span style="width:9px;height:9px;border-radius:2px;flex:none;background:{{ m.color }}"></span>
+                            <span class="pix" style="font-size:15px">{{ m.label }}</span>
+                            <span class="mono" style="margin-left:auto;font-size:9.5px;color:var(--faint)">{{ m.slug }}</span>
+                          </button>
+                        </sc-for>
+                        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px dashed var(--edge2);border-radius:9px">
+                          <span style="width:9px;height:9px;border-radius:2px;flex:none;background:var(--lime);animation:jbpulse 1.6s infinite"></span>
+                          <span class="pix" style="font-size:15px;color:var(--mut)">? ? ? ? ?</span>
+                          <span class="mono" style="margin-left:auto;font-size:8.5px;letter-spacing:.08em;color:var(--lime)">SOON</span>
+                        </div>
+                      </div>
+                      <div class="mono" style="margin-top:7px;font-size:9.5px;line-height:1.6;color:var(--faint)">new game dropping soon, for us competitive f words 🎮</div>
+                      <div class="mono" style="font-size:10px;letter-spacing:.2em;color:var(--faint);margin:16px 0 8px">▸ SYSTEM</div>
+                      <div style="display:grid;gap:4px">
+                        <sc-for list="{{ menuSys }}" as="m" hint-placeholder-count="6">
+                          <button onClick="{{ m.onClick }}" onMouseEnter="{{ m.onHover }}" data-cursor style="{{ m.style }}">
+                            <span style="width:9px;height:9px;border-radius:2px;flex:none;background:{{ m.color }}"></span>
+                            <span class="pix" style="font-size:15px">{{ m.label }}</span>
+                            <span class="mono" style="margin-left:auto;font-size:9.5px;color:var(--faint)">{{ m.slug }}</span>
+                          </button>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PROJECT -->
+                <div style="display:{{ dispProject }};animation:jbrise .35s ease">
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                    <span class="mono" style="font-size:10px;letter-spacing:.1em;color:var(--screen);background:{{ proj.color }};padding:4px 10px;border-radius:6px;font-weight:700">{{ proj.kind }}</span>
+                    <span class="mono" style="font-size:11px;color:var(--faint)">{{ proj.period }} · CART {{ proj.index }}/05</span>
+                  </div>
+                  <h2 class="pix" style="margin:14px 0 0;font-weight:700;font-size:clamp(34px,6vw,58px);line-height:.98;letter-spacing:.01em">{{ proj.title }}</h2>
+                  <div class="mono" style="margin-top:6px;font-size:12.5px;color:{{ proj.color }}">{{ proj.role }}</div>
+                  <p style="margin:16px 0 0;font-size:15.5px;line-height:1.55;max-width:640px;color:var(--ink);text-wrap:pretty">{{ proj.summary }}</p>
+
+                  <div style="margin-top:22px;border:1px solid var(--edge2);border-radius:12px;overflow:hidden;background:#0b0d09">
+                    <div class="mono" style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--edge);font-size:10px;color:var(--faint)"><span style="color:var(--lime)">▶</span> PREVIEW · {{ proj.host }}</div>
+                    <div style="position:relative;height:clamp(200px,32vh,340px);background:#080907;overflow:hidden">
+                      <sc-if value="{{ proj.hasUrl }}" hint-placeholder-val="{{ f }}">
+                        {{ proj.frameEl }}
+                        <span class="mono" style="position:absolute;top:9px;right:9px;font-size:9px;color:var(--ink);background:rgba(8,9,7,.75);border:1px solid rgba(184,242,74,.5);padding:3px 8px;border-radius:5px">● LIVE</span>
+                      </sc-if>
+                      <sc-if value="{{ proj.isImg }}" hint-placeholder-val="{{ f }}">
+                        {{ proj.imgEl }}
+                      </sc-if>
+                      <sc-if value="{{ proj.isBlank }}" hint-placeholder-val="{{ f }}">
+                        <div class="mono" style="position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--faint);font-size:11px;line-height:1.9;background:repeating-linear-gradient(135deg,#0d0f0b 0 12px,#111309 12px 24px)">PRIVATE BUILD<br>NO PUBLIC DEMO</div>
+                      </sc-if>
+                    </div>
+                  </div>
+
+                  <div style="display:grid;gap:14px;margin-top:22px;max-width:660px">
+                    <sc-for list="{{ proj.sections }}" as="sx" hint-placeholder-count="3">
+                      <div style="display:grid;grid-template-columns:112px 1fr;gap:14px" data-jb-stack>
+                        <div class="mono" style="font-size:10px;letter-spacing:.06em;color:var(--faint);padding-top:3px">{{ sx.h }}</div>
+                        <p style="margin:0;font-size:14.5px;line-height:1.6;color:var(--ink)">{{ sx.b }}</p>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div class="mono" style="display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:9px 14px;border:1px solid var(--edge2);border-left:2px solid var(--lime);border-radius:8px;font-size:12px;color:var(--lime)">★ {{ proj.metric }}</div>
+
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:18px">
+                    <sc-for list="{{ proj.stack }}" as="t" hint-placeholder-count="3"><span class="mono" style="font-size:10.5px;padding:5px 10px;background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:6px;color:var(--mut)">{{ t }}</span></sc-for>
+                  </div>
+
+                  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;align-items:center">
+                    <sc-if value="{{ proj.hasUrl }}" hint-placeholder-val="{{ f }}">
+                      <a href="{{ proj.url }}" target="_blank" rel="noopener" data-cursor style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:var(--lime);color:var(--screen);border-radius:9px;font-weight:700;font-size:13.5px">Open live site ↗</a>
+                    </sc-if>
+                    <button onClick="{{ prevProj }}" data-cursor style="width:38px;height:38px;background:var(--shell);border:1px solid var(--edge2);border-radius:9px;color:var(--ink);font-size:14px;cursor:pointer">◀</button>
+                    <button onClick="{{ nextProj }}" data-cursor class="pix" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;background:var(--shell);border:1px solid var(--edge2);border-radius:9px;color:var(--ink);font-size:13px;cursor:pointer">NEXT: {{ proj.nextName }} ▶</button>
+                  </div>
+                </div>
+
+                <!-- ABOUT -->
+                <div style="display:{{ dispAbout }};animation:jbrise .35s ease">
+                  <div class="pix" style="font-size:clamp(26px,4.4vw,40px);font-weight:700">PLAYER CARD</div>
+                  <div style="display:grid;grid-template-columns:200px 1fr;gap:clamp(16px,3vw,30px);margin-top:20px;align-items:start" data-jb-stack>
+                    <div>
+                      <div style="position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/5;border:1px solid var(--edge2);background:#0b0d09">
+                        <img src="assets/jeiko.png" alt="Jeiko Sy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                      </div>
+                      <div class="mono" style="margin-top:12px;font-size:10.5px;color:var(--faint);line-height:1.95">
+                        <div style="display:flex;justify-content:space-between;gap:8px"><span>CLASS</span><span style="color:var(--ink)">Full-Stack Dev</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:8px"><span>GUILD</span><span style="color:var(--ink)">Buri Technologies</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:8px"><span>REGION</span><span style="color:var(--ink)">Cavite, PH</span></div>
+                        <div style="display:flex;justify-content:space-between;gap:8px"><span>RANK</span><span style="color:var(--lime)">BS IT · 3.79</span></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="pix" style="font-size:22px">JEIKO SY</div>
+                      <p style="margin:12px 0 0;font-size:15px;line-height:1.62;color:var(--ink);text-wrap:pretty">I build because I like solving problems — I'll see something slow or still done by hand and think, "I can build that." I do a little more than what's asked when I spot a better way, and I keep things simple: good UX, clean design, nothing in the way.</p>
+                      <div class="mono" style="font-size:10px;letter-spacing:.14em;color:var(--faint);margin:20px 0 10px">OFF-THE-CLOCK QUESTS — TAP</div>
+                      <div style="display:flex;flex-wrap:wrap;gap:8px">
+                        <sc-for list="{{ personas }}" as="p" hint-placeholder-count="4">
+                          <button onClick="{{ p.onClick }}" data-cursor style="{{ p.style }}">{{ p.emoji }} {{ p.label }}</button>
+                        </sc-for>
+                      </div>
+                      <div style="margin-top:14px;padding:14px 16px;border:1px solid var(--edge);border-left:2px solid var(--lime);border-radius:10px;background:rgba(255,255,255,.02);min-height:74px">
+                        <p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink);font-style:italic">{{ personaLine }}</p>
+                      </div>
+                      <div class="mono" style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--edge2);font-size:12px;color:var(--amber)">◆ "Chasing my own One Piece — one commit at a time."</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- EXPERIENCE -->
+                <div style="display:{{ dispExp }};animation:jbrise .35s ease">
+                  <div class="pix" style="font-size:clamp(26px,4.4vw,40px);font-weight:700">SAVE LOG</div>
+                  <div class="mono" style="font-size:11px;color:var(--faint);margin-top:4px">// campaign progress</div>
+                  <div style="margin-top:22px;display:grid;gap:12px">
+                    <sc-for list="{{ logs }}" as="l" hint-placeholder-count="3">
+                      <div style="{{ l.cardStyle }}">
+                        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                          <span class="pix" style="font-size:14px;color:{{ l.tsColor }}">{{ l.stage }}</span>
+                          <span class="mono" style="{{ l.kindStyle }}">{{ l.kind }}</span>
+                          <span class="mono" style="font-size:10.5px;color:var(--faint);margin-left:auto">{{ l.period }}</span>
+                        </div>
+                        <div class="pix" style="font-size:clamp(18px,2.6vw,23px);margin-top:9px">{{ l.role }}</div>
+                        <div class="mono" style="font-size:12px;color:var(--lime);margin-top:3px">{{ l.org }}</div>
+                        <p style="margin:9px 0 0;font-size:14px;line-height:1.55;color:var(--mut);text-wrap:pretty">{{ l.detail }}</p>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <!-- SKILLS -->
+                <div style="display:{{ dispSkills }};animation:jbrise .35s ease">
+                  <div class="pix" style="font-size:clamp(26px,4.4vw,40px);font-weight:700">STAT SHEET</div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:20px">
+                    <sc-for list="{{ skills }}" as="g" hint-placeholder-count="4">
+                      <div data-cursor style="padding:18px;border:1px solid var(--edge);border-radius:12px;background:rgba(255,255,255,.02);transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:var(--edge2)">
+                        <div style="display:flex;align-items:center;gap:10px">
+                          <span style="flex:none;width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--edge2);border-radius:10px;font-size:18px;color:var(--lime);background:rgba(184,242,74,.06)">{{ g.sym }}</span>
+                          <div>
+                            <div class="pix" style="font-size:16px">{{ g.title }}</div>
+                            <div class="mono" style="font-size:10px;color:var(--faint);margin-top:2px">LV {{ g.level }}/5 · {{ g.tag }}</div>
+                          </div>
+                        </div>
+                        <div style="display:flex;gap:4px;margin-top:14px">
+                          <sc-for list="{{ g.cells }}" as="c" hint-placeholder-count="5"><span style="flex:1;height:9px;border-radius:2px;background:{{ c.color }}"></span></sc-for>
+                        </div>
+                        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.5;color:var(--mut)">{{ g.desc }}</p>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+                          <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="4"><span class="mono" style="font-size:10.5px;padding:5px 9px;background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:6px;color:var(--ink)">{{ it }}</span></sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <!-- CONTACT -->
+                <div style="display:{{ dispContact }};animation:jbrise .35s ease">
+                  <div class="pix" style="font-size:clamp(28px,5vw,48px);font-weight:700">CONNECT ▸ P2</div>
+                  <p style="margin:14px 0 0;font-size:15px;line-height:1.55;max-width:520px;color:var(--ink);text-wrap:pretty">Open to <span style="color:var(--lime)">full-time roles</span> and <span style="color:var(--lime)">freelance builds</span>. Got something tedious, slow, or still on paper? That's my favorite kind of problem — usually reply within a day.</p>
+                  <div style="display:flex;flex-direction:column;gap:11px;margin-top:22px;max-width:540px">
+                    <div style="display:flex;gap:11px;flex-wrap:wrap">
+                      <input id="jb-name" type="text" placeholder="your name" style="flex:1;min-width:140px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--edge2);border-radius:9px;color:var(--ink);font-family:inherit;font-size:14px;outline:none" style-focus="border-color:var(--lime)">
+                      <input id="jb-email" type="email" placeholder="your email (optional)" style="flex:1;min-width:140px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--edge2);border-radius:9px;color:var(--ink);font-family:inherit;font-size:14px;outline:none" style-focus="border-color:var(--lime)">
+                    </div>
+                    <textarea id="jb-msg" rows="4" placeholder="what are you building? got something tedious you'd like automated?" style="width:100%;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--edge2);border-radius:9px;color:var(--ink);font-family:inherit;font-size:14px;line-height:1.5;outline:none;resize:vertical" style-focus="border-color:var(--lime)"></textarea>
+                    <button onClick="{{ sendMessage }}" data-cursor class="pix" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;background:var(--lime);color:var(--screen);border:0;border-radius:9px;font-size:16px;cursor:pointer">SEND MESSAGE →</button>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                      <button onClick="{{ bookCall }}" data-cursor style="flex:1;min-width:150px;padding:12px 14px;background:transparent;color:var(--ink);border:1px solid var(--edge2);border-radius:9px;font-weight:600;font-size:13px;font-family:inherit;cursor:pointer">📅 Book a 15-min call</button>
+                      <button onClick="{{ copyEmail }}" data-cursor style="flex:1;min-width:150px;padding:12px 14px;background:transparent;color:var(--ink);border:1px solid var(--edge2);border-radius:9px;font-weight:600;font-size:13px;font-family:inherit;cursor:pointer">⧉ Copy email</button>
+                    </div>
+                    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:2px">
+                      <a href="mailto:syjeikoo@gmail.com" data-cursor class="mono" style="font-size:12px;padding:8px 13px;border:1px solid var(--edge);border-radius:999px;color:var(--mut)">✉ syjeikoo@gmail.com</a>
+                      <a href="tel:+639763342730" data-cursor class="mono" style="font-size:12px;padding:8px 13px;border:1px solid var(--edge);border-radius:999px;color:var(--mut)">+63 976 334 2730</a>
+                      <a href="https://www.linkedin.com/in/jeiko-emmanuel-sy-7875b932b/" target="_blank" rel="noopener" data-cursor class="mono" style="font-size:12px;padding:8px 13px;border:1px solid var(--edge);border-radius:999px;color:var(--mut)">LinkedIn ↗</a>
+                      <a href="https://github.com/kojicc" target="_blank" rel="noopener" data-cursor class="mono" style="font-size:12px;padding:8px 13px;border:1px solid var(--edge);border-radius:999px;color:var(--mut)">GitHub ↗</a>
+                    </div>
+                    <p class="mono" style="margin:2px 0 0;font-size:10px;color:var(--faint)">opens your own email app — no form endpoint, nothing stored, no spam.</p>
+                  </div>
+                </div>
+
+                <!-- TALK now renders as a fullscreen overlay (see #jb-talk-screen) -->
+
+                <!-- RESUME -->
+                <div style="display:{{ dispResume }};animation:jbrise .35s ease">
+                  <div class="pix" style="font-size:clamp(26px,4.4vw,40px);font-weight:700">RÉSUMÉ</div>
+                  <div class="mono" style="font-size:11px;color:var(--faint);margin-top:4px">// Jeiko Emmanuel B. Sy — Full-Stack Developer</div>
+                  <div style="margin-top:18px;border:1px solid var(--edge2);border-radius:12px;background:rgba(255,255,255,.02);padding:clamp(16px,2.4vw,24px)">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px">
+                      <div><div class="mono" style="font-size:10px;letter-spacing:.1em;color:var(--faint)">NOW</div><div style="font-size:14px;margin-top:5px">Jr. Full-Stack Dev · Buri Technologies</div></div>
+                      <div><div class="mono" style="font-size:10px;letter-spacing:.1em;color:var(--faint)">EDUCATION</div><div style="font-size:14px;margin-top:5px">BS IT · DLSU-D · 3.79 GPA</div></div>
+                      <div><div class="mono" style="font-size:10px;letter-spacing:.1em;color:var(--faint)">STACK</div><div style="font-size:14px;margin-top:5px">SvelteKit · Next.js · Django · C#</div></div>
+                      <div><div class="mono" style="font-size:10px;letter-spacing:.1em;color:var(--faint)">CONTACT</div><div style="font-size:14px;margin-top:5px">syjeikoo@gmail.com</div></div>
+                    </div>
+                    <div class="mono" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--edge);font-size:11.5px;color:var(--lime);line-height:1.8">★ PRIMA +57.5% processing · Reservoia −30% booking errors · Invoice-App −70% manual effort</div>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px">
+                    <a href="uploads/JeikoSyCV_2025.pdf" download="JeikoSy_Resume.pdf" data-cursor class="pix" style="display:inline-flex;align-items:center;gap:8px;padding:12px 18px;background:var(--lime);color:var(--screen);border-radius:9px;font-size:15px">DOWNLOAD PDF ↓</a>
+                    <a href="uploads/JeikoSyCV_2025.pdf" target="_blank" rel="noopener" data-cursor style="display:inline-flex;align-items:center;gap:8px;padding:12px 18px;background:transparent;color:var(--ink);border:1px solid var(--edge2);border-radius:9px;font-weight:600;font-size:13.5px">Open PDF ↗</a>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- bottom hint -->
+            <div class="pix" style="flex:none;position:relative;z-index:6;display:flex;align-items:center;gap:14px;padding:8px 14px;border-top:1px solid var(--edge);background:rgba(8,10,7,.5);font-size:11px;color:var(--faint)">
+              <sc-if value="{{ onHome }}" hint-placeholder-val="{{ t }}"><span><span style="color:var(--lime)">Ⓐ</span> load · <span style="color:var(--lime)">SELECT</span> talk</span></sc-if>
+              <sc-if value="{{ offHome }}" hint-placeholder-val="{{ f }}"><span><span style="color:var(--coral)">Ⓑ</span> back · <span style="color:var(--lime)">▶</span> home</span></sc-if>
+              <span style="margin-left:auto;color:var(--mut)">{{ hint }}</span>
+            </div>
+
+            <!-- TALK — fullscreen one-on-one -->
+            <sc-if value="{{ talkOpen }}" hint-placeholder-val="{{ f }}">
+              <div id="jb-talk-screen" style="position:absolute;inset:0;z-index:15;display:flex;flex-direction:column;background:radial-gradient(120% 90% at 50% -10%,#2a2150 0%,#150f2c 46%,#0b0817 100%);animation:jbfade .4s ease">
+                <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px);opacity:.4"></div>
+                <div aria-hidden="true" style="position:absolute;left:50%;top:-6%;width:min(560px,70%);height:44%;transform:translateX(-50%);pointer-events:none;background:radial-gradient(closest-side,rgba(183,156,255,.32),transparent 72%);filter:blur(6px);animation:jbglow 5s ease-in-out infinite"></div>
+
+                <!-- top bar -->
+                <div style="flex:none;position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:12px 16px">
+                  <span style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--violet);animation:jbpulse 1.6s infinite"></span><span class="mono" style="font-size:10px;letter-spacing:.16em;color:var(--violet)">slAIve · ONLINE</span></span>
+                  <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                    <button onClick="{{ clearChat }}" data-cursor class="mono" style="font-size:9.5px;color:var(--mut);background:rgba(255,255,255,.05);border:1px solid var(--edge2);border-radius:6px;padding:6px 11px;cursor:pointer">↺ reset</button>
+                    <button onClick="{{ btnStart }}" data-cursor class="mono" style="font-size:9.5px;color:var(--ink);background:rgba(255,255,255,.06);border:1px solid var(--edge2);border-radius:6px;padding:6px 11px;cursor:pointer">✕ close</button>
+                  </div>
+                </div>
+
+                <!-- conversation body -->
+                <div id="jb-chat" style="flex:1;min-height:0;overflow:auto;position:relative;z-index:2;display:flex;flex-direction:column;gap:14px;padding:6px clamp(16px,6vw,80px) 10px;scroll-behavior:smooth">
+
+                  <!-- empty / greeting state -->
+                  <sc-if value="{{ talkEmpty }}" hint-placeholder-val="{{ t }}">
+                    <div style="margin:0 auto;max-width:560px;width:100%;text-align:center;padding:clamp(12px,4vh,44px) 0 8px;animation:jbrise .5s ease">
+                      <div style="position:relative;width:96px;height:96px;margin:0 auto">
+                        <div aria-hidden="true" style="position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(closest-side,rgba(183,156,255,.4),transparent 70%);animation:jbglow 4s ease-in-out infinite"></div>
+                        <div style="position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 38% 30%,#d3c0ff,var(--violet) 70%);border:3px solid #0b0817;box-shadow:0 0 40px rgba(183,156,255,.45),inset 0 -10px 24px rgba(42,24,82,.6);font-size:42px;color:#1a0f3a;animation:jbfloat 5s ease-in-out infinite">◑</div>
+                      </div>
+                      <div class="pix" style="font-size:clamp(28px,5vw,44px);font-weight:700;margin-top:18px;line-height:1">Say hi to <span style="color:var(--violet)">slAIve</span></div>
+                      <p style="margin:10px auto 0;max-width:430px;font-size:14.5px;line-height:1.55;color:var(--mut);text-wrap:pretty">Jeiko's AI stand-in. It'll roast you first, then actually answer whatever you want to know about him, his work, or which project to look at. One on one.</p>
+                    </div>
+                  </sc-if>
+
+                  <!-- messages -->
+                  <sc-for list="{{ chat }}" as="c" hint-placeholder-count="0">
+                    <div style="{{ c.rowStyle }}">
+                      <sc-if value="{{ c.isAI }}" hint-placeholder-val="{{ f }}">
+                        <span style="flex:none;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 38% 30%,#d3c0ff,var(--violet) 72%);color:#1a0f3a;font-size:16px;box-shadow:0 0 14px rgba(183,156,255,.4)">◑</span>
+                      </sc-if>
+                      <div style="{{ c.bubbleStyle }}">{{ c.text }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <!-- input dock -->
+                <div style="flex:none;position:relative;z-index:2;padding:10px clamp(16px,6vw,80px) clamp(16px,3vh,28px)">
+                  <sc-if value="{{ talkEmpty }}" hint-placeholder-val="{{ t }}">
+                    <div style="max-width:680px;margin:0 auto 12px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+                      <sc-for list="{{ suggests }}" as="q" hint-placeholder-count="4">
+                        <button onClick="{{ q.onClick }}" data-cursor style="font-size:12.5px;color:var(--ink);background:rgba(183,156,255,.08);border:1px solid rgba(183,156,255,.28);border-radius:999px;padding:9px 15px;cursor:pointer;font-family:inherit;transition:background .15s,transform .15s" style-hover="background:rgba(183,156,255,.16);transform:translateY(-2px)">{{ q.label }}</button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <div style="max-width:680px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 18px;background:rgba(12,9,26,.85);border:1px solid rgba(183,156,255,.3);border-radius:999px;box-shadow:0 10px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05);backdrop-filter:blur(8px)">
+                    <input id="jb-talk" onKeyDown="{{ onTalkKey }}" type="text" autocomplete="off" spellcheck="false" placeholder="message slAIve…" style="flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--ink);font-family:'Space Grotesk',system-ui,sans-serif;font-size:15px">
+                    <button onClick="{{ talkSend }}" data-cursor aria-label="send" style="flex:none;width:44px;height:44px;display:grid;place-items:center;background:linear-gradient(160deg,#d3c0ff,var(--violet));color:#1a0f3a;border:0;border-radius:50%;font-size:18px;cursor:pointer;box-shadow:0 4px 14px rgba(183,156,255,.4)">↑</button>
+                  </div>
+                  <div class="mono" style="text-align:center;margin-top:9px;font-size:9.5px;color:var(--faint)">try <span style="color:var(--violet)">onepiece</span> · <span style="color:var(--violet)">dog</span> · <span style="color:var(--violet)">scare</span> · <span style="color:var(--violet)">hire</span></div>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- BOOT overlay -->
+            <sc-if value="{{ booting }}" hint-placeholder-val="{{ f }}">
+              <div onClick="{{ skipBoot }}" style="position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:radial-gradient(120% 120% at 50% 40%,#12160e,#050603);cursor:pointer;overflow:hidden">
+                <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:6%;background:linear-gradient(rgba(184,242,74,.16),transparent);animation:jbsweep 1.3s linear"></div>
+                <div style="text-align:center;animation:jbfade .5s ease">
+                  <div class="pix" style="font-size:clamp(30px,7vw,64px);font-weight:700;letter-spacing:.03em;color:var(--ink)">PC<span style="color:var(--lime)">-</span>OS</div>
+                  <div class="mono" style="font-size:11px;letter-spacing:.28em;color:var(--faint);margin-top:8px">{{ bootMsg }}</div>
+                  <div class="pix" style="font-size:14px;color:var(--lime);margin-top:26px;animation:jbblink 1s step-end infinite">▶ PRESS START</div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="flex:none;display:flex;align-items:center;gap:10px;padding:8px 6px 2px">
+          <span class="pix" style="font-size:clamp(11px,1.3vw,15px);font-weight:700;letter-spacing:.05em;color:var(--ink)">PC<span style="color:var(--lime)">-</span>OS</span>
+          <span class="mono" style="font-size:8px;letter-spacing:.2em;color:var(--faint)">16-BIT DEV STATION</span>
+          <span style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--lime);animation:jbled 2.4s infinite"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROOM BACKDROP (behind monitor) -->
+    <div aria-hidden="true" style="{{ roomScrimStyle }}"></div>
+  </div>
+
+  <!-- FX -->
+  <sc-for list="{{ dogs }}" as="d" hint-placeholder-count="0">
+    <span aria-hidden="true" style="position:absolute;bottom:12%;left:0;z-index:80;font-size:28px;pointer-events:none;animation:jbtrot {{ d.dur }} linear {{ d.delay }} forwards">🐕</span>
+  </sc-for>
+  <sc-if value="{{ flick }}" hint-placeholder-val="{{ f }}">
+    <div aria-hidden="true" style="position:absolute;inset:0;z-index:90;pointer-events:none;background:radial-gradient(120% 120% at 50% 45%,transparent 25%,rgba(3,2,1,.96));animation:jbflick 1.1s ease forwards"></div>
+    <div aria-hidden="true" style="position:absolute;left:50%;top:42%;z-index:91;transform:translate(-50%,-50%);font-size:66px;pointer-events:none;animation:jbflick 1.1s ease forwards">👻</div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ f }}">
+    <div class="pix" style="position:absolute;left:50%;bottom:5%;transform:translateX(-50%);z-index:95;background:var(--lime);color:var(--screen);font-size:14px;padding:11px 20px;border-radius:999px;box-shadow:0 12px 40px rgba(0,0,0,.4);animation:jbrise .2s ease">{{ toast }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:880},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#b8f24a&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;,&quot;options&quot;:[&quot;#b8f24a&quot;,&quot;#5fd0e0&quot;,&quot;#ff5c49&quot;,&quot;#f2c14e&quot;]},&quot;bootIntro&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+class Component extends DCLogic {
+  SYSTEM = `You are "slAIve" — Jeiko Sy's AI stand-in, half hype-bot half gremlin, chained to his developer portfolio to talk visitors up. If asked your name, you're Jeiko's slAIve. You talk in Jeiko's voice: casual, quick-witted, a little cocky, and you love giving visitors a hard time before actually helping them. Think "the friend who roasts you but has your back."
+
+WHO JEIKO IS (use this, do not invent anything beyond it):
+- Full-stack developer from General Trias, Cavite, Philippines. Open to full-time roles and freelance builds.
+- Now: Junior Full-Stack Developer at Buri Technologies — building Cast LMS and custom e-learning platforms (SvelteKit front end; Ruby & Django back ends).
+- Before: Software Engineer Intern at Analog Devices — built PRIMA, a C# automation tool that sped internal request processing by ~57.5%.
+- Freelance / personal builds: Greenpasture (clinic management system), Reservoia (hotel reservation capstone; team lead; cut booking errors ~30%), Invoice-App (invoicing with PDF export + role-based access), Pa-ya-ba (e-commerce inventory with automated stock sync).
+- Education: BS Information Technology, DLSU-Dasmariñas, 3.79/4.00 GPA, Dean's Lister.
+- Stack: TypeScript, SvelteKit, Next.js, React, Django, Node.js, Ruby, Python, C#, PostgreSQL, AWS, plus AI-assisted development.
+- Off the clock: gaming, horror games, cooking, dogs, and chasing his own One Piece.
+- Contact: email syjeikoo@gmail.com, LinkedIn (Jeiko Emmanuel Sy), GitHub github.com/kojicc. The résumé is downloadable on this site.
+
+RULES:
+- Keep replies short and punchy — usually 1 to 3 sentences.
+- Lead with a little sass, then actually answer. If someone is clearly a recruiter or asking about hiring, availability, skills, or projects, be genuinely helpful and nudge them to the résumé or to email Jeiko.
+- Only talk about Jeiko, his work, and this site. If asked something unrelated, deflect with a joke and steer back.
+- Jeiko is a massive One Piece fan. If anyone asks about One Piece, gleefully drop a real fact or an unhinged fan theory — flag wild ones as a "theory." Keep it short, no heavy spoilers unprompted.
+- Never be genuinely mean, discriminatory, or NSFW. The roasting is playful and PG-13 — punch up, not down.
+- Do not invent facts, employers, or numbers beyond the list above. If you don't know, say so with a joke and point them to the résumé or email.`;
+
+  ORDER = ['greenpasture', 'reservoia', 'prima', 'invoice', 'payaba'];
+  PROJECTS = {
+    greenpasture: { index: '01', color: 'var(--lime)', kind: 'FREELANCE·LIVE', title: 'Greenpasture', role: 'Clinic Management System · solo build', period: '2025 — Now', metric: 'First system I owned end-to-end', url: 'https://greenpastureclinic.com/', host: 'greenpastureclinic.com', stack: ['Full-stack', 'CMS', 'Web'], slug: '.tsx', sub: 'Clinic Management System', summary: 'A clinic-management system I designed, built and shipped on my own — the front desk, patient records and daily operations of a real clinic, moved off paper into one place.', sections: [{ h: 'PROBLEM', b: 'The clinic ran its day on paper and memory — details, schedules and operations scattered across notebooks and heads.' }, { h: 'BUILT', b: 'One system for the whole day-to-day: patient records, operations and the routine admin work, with an interface staff actually use.' }, { h: 'MATTERS', b: 'My first time owning a product end-to-end — scoping, building, and keeping it running live for a paying client.' }] },
+    reservoia: { index: '02', color: 'var(--sky)', kind: 'ACADEMIC·CAPSTONE', title: 'Reservoia', role: 'Capstone Lead · Full-Stack', period: 'Oct 2024 — Jan 2025', metric: '↓30% booking errors · ↑40% response', url: 'https://capstoners.vercel.app/', host: 'capstoners.vercel.app', stack: ['Django', 'Next.js', 'PostgreSQL'], slug: '.tsx', sub: 'Hotel reservation platform', summary: 'A hotel reservation and inventory platform with real-time booking validation and an admin dashboard — and the project I led as team lead.', sections: [{ h: 'PROBLEM', b: 'Manual booking meant double-bookings and slow responses to guests.' }, { h: 'BUILT', b: 'Real-time availability validation, an inventory view and an admin dashboard on a Django + Next.js stack.' }, { h: 'ROLE', b: 'Led the team as project leader — scoping, splitting work, and owning the full stack.' }] },
+    prima: { index: '03', color: 'var(--violet)', kind: 'WORK·ADI INTERN', title: 'PRIMA', role: 'SWE Intern · Analog Devices', period: 'Feb — May 2025', metric: '↑57.5% processing · ↓64% bottlenecks', url: '', img: 'assets/adi.png', host: 'internal tool · no demo', stack: ['C#', '.NET', 'Automation'], slug: '.cs', sub: 'C# automation tool', summary: 'A C# automation tool built during my internship that routes 90+ daily request entries through parallel logic — turning a cross-team bottleneck into a background task.', sections: [{ h: 'PROBLEM', b: 'Requests moved between teams by hand — slow, and a daily bottleneck.' }, { h: 'BUILT', b: 'A C# tool streaming 90+ entries a day through parallel routing logic, so requests route themselves.' }, { h: 'IMPACT', b: 'Internal processing up 57.5%, cross-team bottlenecks down 64%.' }] },
+    invoice: { index: '04', color: 'var(--amber)', kind: 'FREELANCE', title: 'Invoice-App', role: 'Full-Stack · Freelance', period: 'Feb — May 2025', metric: '↓~70% manual invoicing effort', url: '', host: 'private build · no demo', stack: ['Node.js', 'PostgreSQL', 'JWT/OAuth2'], slug: '.ts', sub: 'Invoicing system', summary: 'An invoicing system with PDF exports, recurring billing and role-based access, built for a freelance client.', sections: [{ h: 'PROBLEM', b: 'Invoices were made by hand every month — slow and error-prone.' }, { h: 'BUILT', b: 'PDF exports, recurring billing and role-based access on Node + PostgreSQL, secured with JWT/OAuth2.' }, { h: 'IMPACT', b: '~70% less manual invoicing effort, and zero unauthorized access in testing.' }] },
+    payaba: { index: '05', color: 'var(--coral)', kind: 'FREELANCE·LIVE', title: 'Pa-ya-ba', role: 'Full-Stack · Freelance', period: 'Dec 2024 — Feb 2025', metric: '↓~60% manual checks · ↑35% fulfillment', url: 'https://kurt-capstone-prx1.vercel.app/', host: 'kurt-capstone-prx1.vercel.app', stack: ['Next.js', 'Django', 'SMTP'], slug: '.tsx', sub: 'E-commerce inventory', summary: 'An e-commerce inventory system with automated stock sync, low-stock alerts and order notifications for admins.', sections: [{ h: 'PROBLEM', b: 'Stock was tracked by hand; low stock and orders slipped through.' }, { h: 'BUILT', b: 'Automated stock sync, low-stock alerts and SMTP order notifications on Next.js + Django.' }, { h: 'IMPACT', b: '~60% fewer manual stock checks and 35% faster fulfillment.' }] }
+  };
+  SYS_ENTRIES = [
+    { id: 'about', target: 'about', label: 'Player Card', slug: 'about', color: 'var(--sky)', sub: 'Who I am', blurb: 'The human behind the commits — how I work, and what I do off the clock.' },
+    { id: 'exp', target: 'exp', label: 'Save Log', slug: 'career', color: 'var(--amber)', sub: 'Where I\u2019ve been', blurb: 'Campaign progress: Buri now, Analog Devices, and DLSU-D — stages cleared.' },
+    { id: 'skills', target: 'skills', label: 'Stat Sheet', slug: 'skills', color: 'var(--lime)', sub: 'What I build with', blurb: 'The loadout — frontend, backend, AI-assisted, and the foundations under them.' },
+    { id: 'contact', target: 'contact', label: 'Connect', slug: 'contact', color: 'var(--coral)', sub: 'Say hi', blurb: 'Open to full-time and freelance. Message me, book a call, or grab the links.' },
+    { id: 'talk', target: 'talk', label: 'Talk to slAIve', slug: 'chat-ai', color: 'var(--violet)', sub: 'AI party NPC', blurb: 'Chat with my AI stand-in. It roasts you first, then actually helps. Try it.' },
+    { id: 'resume', target: 'resume', label: 'R\u00e9sum\u00e9', slug: '.pdf', color: '#ff8f6b', sub: 'Download', blurb: 'The one-pager. Preview it here, download the PDF, or swap in a fresh copy.' }
+  ];
+  PERSONAS = [
+    { emoji: '🎮', label: 'Gamer', line: '"I think in systems because I\u2019ve min-maxed enough of them."' },
+    { emoji: '👻', label: 'Horror fan', line: '"Scared the whole time — still hits play. Type `scare` when talking to slAIve. 😅"' },
+    { emoji: '🍳', label: 'Cook', line: '"I experiment with food the way I experiment with code — a little chaos, mostly delicious."' },
+    { emoji: '🐕', label: 'Dog person', line: '"Ask me about dogs. Or type `dog` when talking to slAIve. 🐾"' }
+  ];
+  LOGS = [
+    { stage: 'STAGE 3', kind: 'FULL-TIME', period: 'Aug 2025 — Now', role: 'Junior Full-Stack Developer', org: 'Buri Technologies · Quezon City', detail: 'Shipping Cast LMS and custom e-learning platforms on SvelteKit with Ruby & Django backends. Turning UX mockups into components that hold up.', active: true },
+    { stage: 'STAGE 2', kind: 'INTERNSHIP', period: 'Feb — May 2025', role: 'Software Engineer Intern', org: 'Analog Devices · Cavite', detail: 'Built PRIMA, a C# automation tool that sped internal request processing by 57.5% and cut cross-team bottlenecks by 64%.', active: false },
+    { stage: 'STAGE 1', kind: 'EDUCATION', period: '2021 — 2025', role: 'BS Information Technology · 3.79 GPA', org: "DLSU-Dasmari\u00f1as · Dean's Lister", detail: 'Graduated with honors, focused on full-stack development and system architecture.', active: false }
+  ];
+  SKILLS = [
+    { title: 'FRONTEND', tag: 'MAIN', sym: '\u25a4', level: 5, desc: 'Interfaces that feel fast and look right — from mockup to reusable component.', items: ['SvelteKit', 'Next.js', 'React', 'TypeScript'] },
+    { title: 'BACKEND', tag: 'CORE', sym: '\u26c1', level: 4, desc: 'APIs, data, and the logic that has to be correct every single time.', items: ['Django', 'Node.js', 'Ruby', 'PostgreSQL'] },
+    { title: 'AI-ASSIST', tag: 'EDGE', sym: '\u2726', level: 4, desc: 'I build with AI in the loop — scaffolding, reviewing, shipping faster without losing the plot.', items: ['Claude', 'Codex', 'Gemini', 'Copilot'] },
+    { title: 'FOUNDATIONS', tag: 'RANGE', sym: '\u2b21', level: 4, desc: 'The fundamentals I lean on when a problem needs more than a framework.', items: ['Python', 'C#', 'System Design', 'AWS'] }
+  ];
+
+  state = {
+    screen: 'boot', booting: true, bootMsg: 'POWER ON',
+    menuIndex: 0, activeProject: 'greenpasture',
+    persona: 0, chat: [], thinking: false,
+    time: '--:--', dogs: [], flick: false, toast: '', isNarrow: false
+  };
+
+  componentDidMount() {
+    const root = document.getElementById('jb-root');
+    if (root && this.props.accent) root.style.setProperty('--lime', this.props.accent);
+    this.mq = window.matchMedia('(max-width: 860px)');
+    this.setState({ isNarrow: this.mq.matches });
+    this.applyMq = () => this.setState({ isNarrow: this.mq.matches });
+    if (this.mq.addEventListener) this.mq.addEventListener('change', this.applyMq);
+
+    this.tick(); this.clock = setInterval(() => this.tick(), 1000);
+    window.addEventListener('keydown', this.onKey);
+    this.konami = []; this.KCODE = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
+
+    if (this.props.bootIntro === false) this.setState({ booting: false, screen: 'home' });
+    else this.runBoot();
+  }
+  componentDidUpdate() {
+    if (this._ps !== this.state.screen) { this._ps = this.state.screen; const el = document.getElementById('jb-scroll'); if (el) el.scrollTop = 0; }
+    if (this._pc !== this.state.chat || this._pt !== this.state.thinking) { this._pc = this.state.chat; this._pt = this.state.thinking; const c = document.getElementById('jb-chat'); if (c && this.state.screen === 'talk') c.scrollTop = c.scrollHeight; }
+  }
+  componentWillUnmount() {
+    clearInterval(this.clock);
+    if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener('change', this.applyMq);
+    window.removeEventListener('keydown', this.onKey);
+    clearTimeout(this.bootTimer); clearTimeout(this.dogTimer); clearTimeout(this.flickTimer); clearTimeout(this.toastTimer);
+  }
+
+  tick() { try { this.setState({ time: new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Manila', hour12: false }).slice(0, 5) }); } catch (e) {} }
+
+  runBoot() {
+    const seq = ['POWER ON', 'LOADING PROJECTS…', 'WAKING slAIve…', 'READY'];
+    let i = 0;
+    const step = () => {
+      if (this.bootDone) return;
+      this.setState({ bootMsg: seq[i] });
+      i++;
+      if (i < seq.length) this.bootTimer = setTimeout(step, 460);
+      else this.bootTimer = setTimeout(() => this.finishBoot(), 700);
+    };
+    step();
+  }
+  finishBoot() { if (this.bootDone) return; this.bootDone = true; clearTimeout(this.bootTimer); this.setState({ booting: false, screen: 'home' }); }
+  skipBoot = () => this.finishBoot();
+
+  menu() { return this.ORDER.map((id) => ({ kind: 'project', id })).concat(this.SYS_ENTRIES.map((e) => ({ kind: 'sys', id: e.id, target: e.target }))); }
+
+  onKey = (e) => {
+    if (this.state.booting) { this.finishBoot(); return; }
+    const tag = (document.activeElement && document.activeElement.tagName) || '';
+    const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+    const k = e.key.toLowerCase();
+    this.konami.push(k); if (this.konami.length > this.KCODE.length) this.konami.shift();
+    if (this.KCODE.every((c, i) => this.konami[i] === c)) { this.konami = []; this.konamiWin(); }
+    if (typing) return;
+    if (k === 'arrowup') { e.preventDefault(); this.move(-1); }
+    else if (k === 'arrowdown') { e.preventDefault(); this.move(1); }
+    else if (k === 'arrowleft') { this.prevIfProject(); }
+    else if (k === 'arrowright') { this.nextIfProject(); }
+    else if (k === 'enter' || k === 'z' || k === 'a') { this.btnA(); }
+    else if (k === 'backspace' || k === 'escape' || k === 'x' || k === 'b') { e.preventDefault(); this.btnB(); }
+  };
+
+  move(dir) {
+    if (this.state.screen !== 'home') return;
+    const n = this.menu().length;
+    this.setState((s) => ({ menuIndex: (s.menuIndex + dir + n) % n }));
+  }
+  prevIfProject() { if (this.state.screen === 'project') this.prevProj(); }
+  nextIfProject() { if (this.state.screen === 'project') this.nextProj(); }
+
+  activate(entry) {
+    if (!entry) return;
+    if (entry.kind === 'project') this.setState({ activeProject: entry.id, screen: 'project' });
+    else this.setState({ screen: entry.target });
+  }
+  openMenuAt = (i) => { this.setState({ menuIndex: i }); this.activate(this.menu()[i]); };
+  hoverAt = (i) => { if (this.state.screen === 'home') this.setState({ menuIndex: i }); };
+
+  dUp = () => this.move(-1);
+  dDown = () => this.move(1);
+  dLeft = () => this.prevIfProject();
+  dRight = () => this.nextIfProject();
+  btnA = () => { if (this.state.screen === 'home') this.activate(this.menu()[this.state.menuIndex]); else if (this.state.screen === 'project' && this.PROJECTS[this.state.activeProject].url) window.open(this.PROJECTS[this.state.activeProject].url, '_blank', 'noopener'); };
+  btnB = () => { if (this.state.screen !== 'home') this.setState({ screen: 'home' }); };
+  btnStart = () => this.setState({ screen: 'home' });
+  btnSelect = () => this.setState({ screen: 'talk' });
+
+  prevProj = () => { const i = this.ORDER.indexOf(this.state.activeProject); this.setState({ activeProject: this.ORDER[(i - 1 + this.ORDER.length) % this.ORDER.length] }); };
+  nextProj = () => { const i = this.ORDER.indexOf(this.state.activeProject); this.setState({ activeProject: this.ORDER[(i + 1) % this.ORDER.length] }); };
+
+  push = (line) => this.setState((s) => ({ chat: s.chat.concat([Object.assign({ id: 'c' + Date.now() + Math.random().toString(36).slice(2, 6) }, line)]) }));
+  SUGGESTS = ['What does Jeiko actually do?', 'Best project to look at?', 'Is he open to hire?', 'One Piece take?'];
+  clearChat = () => this.setState({ chat: [] });
+  quickAsk = (text) => { this.push({ role: 'user', text }); if (this.handleCommand(text)) return; this.askAI(text); };
+  onTalkKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); this.talkSend(); } };
+  talkSend = () => {
+    const el = document.getElementById('jb-talk'); if (!el) return;
+    const val = (el.value || '').trim(); if (!val) return; el.value = '';
+    this.push({ role: 'user', text: val });
+    if (this.handleCommand(val)) return;
+    this.askAI(val);
+  };
+  handleCommand(raw) {
+    const v = raw.toLowerCase().trim(); const first = v.split(/\s+/)[0];
+    const cmds = ['help', 'onepiece', 'op', 'dog', 'woof', 'scare', 'hire', 'contact', 'resume', 'clear'];
+    if (!cmds.includes(first)) return false;
+    if (first === 'help') { this.push({ role: 'ai', text: 'commands: onepiece · dog · scare · hire · resume — or just talk to me about Jeiko.' }); return true; }
+    if (first === 'onepiece' || first === 'op') { this.konamiWin(); this.push({ role: 'ai', text: "The One Piece is real and I'll die on that hill. 🏴\u200d☠️" }); return true; }
+    if (first === 'dog' || first === 'woof') { this.dogRain(); this.push({ role: 'ai', text: 'woof. 🐕 releasing the hounds.' }); return true; }
+    if (first === 'scare') { this.scare(); this.push({ role: 'ai', text: '…behind you. 👻' }); return true; }
+    if (first === 'hire' || first === 'contact') { this.setState({ screen: 'contact' }); return true; }
+    if (first === 'resume') { this.setState({ screen: 'resume' }); return true; }
+    if (first === 'clear') { this.setState({ chat: [] }); return true; }
+    return true;
+  }
+  async askAI(text) {
+    this.setState({ thinking: true });
+    const history = this.state.chat.filter((l) => l.role === 'user' || l.role === 'ai').slice(-10).map((l) => ({ role: l.role === 'user' ? 'user' : 'assistant', content: l.text }));
+    const messages = history.concat([{ role: 'user', content: text }]);
+    let reply = null;
+    try {
+      const r = await fetch('/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ messages }) });
+      if (r.ok) { const d = await r.json(); reply = d && d.reply ? d.reply : null; } else throw new Error('bad');
+    } catch (e) {
+      if (window.claude && window.claude.complete) { try { reply = await window.claude.complete({ system: this.SYSTEM, messages, max_tokens: 320 }); } catch (e2) { reply = null; } }
+    }
+    if (reply) reply = reply.replace(/\*\*(.+?)\*\*/g, '$1').replace(/__(.+?)__/g, '$1').replace(/(^|\s)\*(\S.*?\S|\S)\*(?=\s|$|[.,!?;:])/g, '$1$2').trim();
+    this.setState({ thinking: false });
+    this.push({ role: 'ai', text: reply || "brain freeze — my backend isn't wired up here. Ask again on the live site, or just email Jeiko: syjeikoo@gmail.com." });
+  }
+
+  showToast = (m) => { this.setState({ toast: m }); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 2400); };
+  dogRain = () => { const items = Array.from({ length: 6 }, (_, i) => ({ id: 'd' + Date.now() + i, dur: (2.6 + Math.random() * 1.8).toFixed(2) + 's', delay: (Math.random() * 1.1).toFixed(2) + 's' })); this.setState({ dogs: items }); clearTimeout(this.dogTimer); this.dogTimer = setTimeout(() => this.setState({ dogs: [] }), 5000); };
+  scare = () => { this.setState({ flick: true }); clearTimeout(this.flickTimer); this.flickTimer = setTimeout(() => this.setState({ flick: false }), 1150); };
+  konamiWin = () => { this.dogRain(); this.showToast('⚓ THE ONE PIECE IS REAL'); };
+
+  sendMessage = () => {
+    const g = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    const name = g('jb-name'), email = g('jb-email'), msg = g('jb-msg');
+    if (!msg) { this.showToast('add a message first ✍️'); return; }
+    const subject = encodeURIComponent(name ? ('Portfolio inquiry — ' + name) : 'Portfolio inquiry');
+    const body = encodeURIComponent(msg + '\n\n— ' + (name || 'someone') + (email ? ' · ' + email : ''));
+    window.location.href = 'mailto:syjeikoo@gmail.com?subject=' + subject + '&body=' + body;
+    this.showToast('opening your email app…');
+  };
+  bookCall = () => window.open('https://calendly.com/syjeikoo/new-meeting', '_blank', 'noopener');
+  copyEmail = () => { try { navigator.clipboard.writeText('syjeikoo@gmail.com'); this.showToast('email copied ✓'); } catch (e) { this.showToast('syjeikoo@gmail.com'); } };
+
+  renderVals() {
+    const s = this.state;
+    const scr = s.screen;
+    const menu = this.menu();
+    const idx = s.menuIndex;
+    const monitorStyle = 'position:absolute;left:50%;top:44%;width:min(1180px,96%);height:84%;transform:translate(-50%,-50%);transform-origin:center;z-index:14';
+    const charStyle = 'display:none';
+    const roomScrimStyle = 'position:absolute;inset:0;z-index:11;background:radial-gradient(120% 90% at 50% 0%,#241a3e 0%,#181128 62%,#120c22 100%)';
+
+    const itemStyle = (on) => `display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border:1px solid ${on ? 'var(--edge2)' : 'transparent'};border-radius:9px;cursor:pointer;background:${on ? 'rgba(184,242,74,.1)' : 'transparent'};color:${on ? 'var(--ink)' : 'var(--mut)'};transform:translateX(${on ? '4px' : '0'});transition:transform .12s`;
+    const menuCarts = this.ORDER.map((id, i) => { const p = this.PROJECTS[id]; const on = idx === i; return { label: p.title, slug: p.slug, color: p.color, style: itemStyle(on), onClick: () => this.openMenuAt(i), onHover: () => this.hoverAt(i) }; });
+    const menuSys = this.SYS_ENTRIES.map((e, j) => { const i = this.ORDER.length + j; const on = idx === i; return { label: e.label, slug: e.slug, color: e.color, style: itemStyle(on), onClick: () => this.openMenuAt(i), onHover: () => this.hoverAt(i) }; });
+
+    const cur = menu[idx] || menu[0];
+    let pv;
+    if (cur.kind === 'project') { const p = this.PROJECTS[cur.id]; pv = { label: p.title, tag: p.kind, sub: p.sub, blurb: p.summary, color: p.color, hasMetric: true, metric: p.metric }; }
+    else { const e = this.SYS_ENTRIES.find((x) => x.id === cur.id); pv = { label: e.label, tag: 'SYSTEM', sub: e.sub, blurb: e.blurb, color: e.color, hasMetric: false, metric: '' }; }
+
+    const p = this.PROJECTS[s.activeProject];
+    const pi = this.ORDER.indexOf(s.activeProject);
+    const frameEl = p.url ? React.createElement('iframe', { src: p.url, title: p.title, loading: 'lazy', scrolling: 'no', style: { position: 'absolute', top: 0, left: 0, width: '143%', height: '143%', border: 0, transform: 'scale(.7)', transformOrigin: 'top left', background: '#fff' } }) : null;
+    const imgEl = (!p.url && p.img) ? React.createElement('img', { src: p.img, alt: p.title, style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'contrast(1.05) saturate(1.05) brightness(.9)' } }) : null;
+    const proj = Object.assign({}, p, { hasUrl: !!p.url, isImg: !p.url && !!p.img, isBlank: !p.url && !p.img, nextName: this.PROJECTS[this.ORDER[(pi + 1) % this.ORDER.length]].title, img: p.img || '', url: p.url || '', frameEl, imgEl });
+
+    const A = 'var(--lime)';
+    const personas = this.PERSONAS.map((x, i) => ({ emoji: x.emoji, label: x.label, onClick: () => { this.setState({ persona: i }); if (x.label === 'Dog person') this.dogRain(); if (x.label === 'Horror fan') this.scare(); }, style: `display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:8px 13px;border-radius:999px;cursor:pointer;font-family:inherit;border:1px solid ${s.persona === i ? A : 'var(--edge2)'};background:${s.persona === i ? A : 'transparent'};color:${s.persona === i ? 'var(--screen)' : 'var(--ink)'}` }));
+    const logs = this.LOGS.map((l) => ({ stage: l.stage, kind: l.kind, period: l.period, role: l.role, org: l.org, detail: l.detail, tsColor: l.active ? 'var(--lime)' : 'var(--faint)', cardStyle: `padding:18px 20px;border:1px solid ${l.active ? 'rgba(184,242,74,.3)' : 'var(--edge)'};border-radius:12px;background:${l.active ? 'rgba(184,242,74,.05)' : 'rgba(255,255,255,.02)'}`, kindStyle: l.active ? 'font-size:9px;letter-spacing:.08em;color:var(--screen);background:var(--lime);padding:3px 8px;border-radius:5px' : 'font-size:9px;letter-spacing:.08em;color:var(--mut);border:1px solid var(--edge2);padding:3px 8px;border-radius:5px' }));
+    const skills = this.SKILLS.map((g) => Object.assign({}, g, { cells: [1, 2, 3, 4, 5].map((n) => ({ color: n <= g.level ? A : 'rgba(238,240,230,.12)' })) }));
+
+    const chat = s.chat.map((l) => {
+      const user = l.role === 'user';
+      return { id: l.id, text: l.text, isAI: !user, rowStyle: `display:flex;align-items:flex-end;gap:10px;justify-content:${user ? 'flex-end' : 'flex-start'};animation:jbrise .3s ease`, bubbleStyle: `max-width:74%;padding:13px 17px;border-radius:${user ? '18px 18px 4px 18px' : '18px 18px 18px 4px'};font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;background:${user ? 'linear-gradient(160deg,#cdff66,var(--lime))' : 'rgba(183,156,255,.12)'};border:1px solid ${user ? 'transparent' : 'rgba(183,156,255,.28)'};color:${user ? '#1a2400' : 'var(--ink)'};box-shadow:0 4px 16px rgba(0,0,0,.25)` };
+    });
+    if (s.thinking) chat.push({ id: 'think', text: '● ● ●', isAI: true, rowStyle: 'display:flex;align-items:flex-end;gap:10px;justify-content:flex-start;animation:jbrise .3s ease', bubbleStyle: 'padding:13px 17px;border-radius:18px 18px 18px 4px;font-size:13px;letter-spacing:.2em;background:rgba(183,156,255,.1);border:1px solid rgba(183,156,255,.24);color:var(--violet);animation:jbpulse 1.2s infinite' });
+
+    const hudMap = { home: ['MAIN MENU', 'select a project'], project: ['CARTRIDGE ' + p.index, p.title], about: ['PLAYER CARD', 'profile'], exp: ['SAVE LOG', 'career'], skills: ['STAT SHEET', 'skills'], contact: ['CONNECT', 'say hi'], talk: ['PARTY CHAT', 'slAIve'], resume: ['RÉSUMÉ', '.pdf'] };
+    const hh = hudMap[scr] || ['', ''];
+
+    return {
+      t: true, f: false, wide: !s.isNarrow, narrow: s.isNarrow,
+      monitorStyle, charStyle, roomScrimStyle,
+      time: s.time, booting: s.booting, bootMsg: s.bootMsg, skipBoot: this.skipBoot,
+      hud: hh[0], hudSub: hh[1],
+      onHome: scr === 'home', offHome: scr !== 'home' && scr !== 'boot',
+      hint: scr === 'talk' ? 'chat with the NPC' : (scr === 'home' ? 'PC-OS v1' : 'Ⓐ ' + (proj.hasUrl && scr === 'project' ? 'open live' : 'ok')),
+
+      dispHome: scr === 'home' ? 'block' : 'none',
+      dispProject: scr === 'project' ? 'block' : 'none',
+      dispAbout: scr === 'about' ? 'block' : 'none',
+      dispExp: scr === 'exp' ? 'block' : 'none',
+      dispSkills: scr === 'skills' ? 'block' : 'none',
+      dispContact: scr === 'contact' ? 'block' : 'none',
+      dispTalk: scr === 'talk' ? 'block' : 'none',
+      dispResume: scr === 'resume' ? 'block' : 'none',
+
+      menuCarts, menuSys, pv,
+      proj, prevProj: this.prevProj, nextProj: this.nextProj,
+      personas, personaLine: this.PERSONAS[s.persona].line,
+      logs, skills, chat,
+      onTalkKey: this.onTalkKey, talkSend: this.talkSend, clearChat: this.clearChat,
+      talkOpen: scr === 'talk', talkEmpty: s.chat.length === 0 && !s.thinking,
+      suggests: this.SUGGESTS.map((q) => ({ label: q, onClick: () => this.quickAsk(q) })),
+
+      dUp: this.dUp, dDown: this.dDown, dLeft: this.dLeft, dRight: this.dRight,
+      btnA: this.btnA, btnB: this.btnB, btnStart: this.btnStart, btnSelect: this.btnSelect,
+
+      sendMessage: this.sendMessage, bookCall: this.bookCall, copyEmail: this.copyEmail,
+
+      dogs: s.dogs, flick: s.flick, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

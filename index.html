@@ -72,7 +72,7 @@
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
       <sc-if value="{{ notNarrow }}" hint-placeholder-val="{{ t }}">
-        <span class="mono" title="You're viewing this page" style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:transparent;border:1px solid var(--line2);border-radius:2px;font-size:11.5px;color:var(--mut)"><span style="width:6px;height:6px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 3px rgba(63,191,106,.18)"></span>online</span>
+        <button onClick="{{ togglePresence }}" data-cursor aria-label="who's viewing" title="Who's viewing" style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:transparent;border:1px solid var(--line2);border-radius:2px;cursor:pointer;color:var(--mut)"><span style="width:6px;height:6px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 3px rgba(63,191,106,.18)"></span><span class="mono" style="font-size:11.5px">{{ viewerCount }} online</span></button>
       </sc-if>
       <button onClick="{{ toggleTheme }}" data-cursor aria-label="toggle theme" title="Toggle theme" style="width:38px;height:38px;flex:0 0 auto;display:grid;place-items:center;background:transparent;border:1px solid var(--line2);border-radius:2px;color:var(--ink);font-size:14px;cursor:pointer;overflow:hidden"><span class="fp-theme-icon" key="{{ themeIcon }}">{{ themeIcon }}</span></button>
       <sc-if value="{{ notNarrow }}" hint-placeholder-val="{{ t }}">
@@ -83,6 +83,28 @@
       </sc-if>
     </div>
   </nav>
+
+  <!-- ===== VIEWERS POPOVER (real presence) ===== -->
+  <sc-if value="{{ presenceOpen }}" hint-placeholder-val="{{ f }}">
+    <div onClick="{{ closePresence }}" style="position:fixed;inset:0;z-index:90;animation:fpfade .15s ease">
+      <div onClick="{{ stop }}" style="position:absolute;top:64px;right:clamp(18px,5vw,60px);width:min(300px,calc(100vw - 32px));background:var(--paper);border:1px solid var(--line2);border-radius:3px;box-shadow:0 24px 60px rgba(0,0,0,.28);overflow:hidden;animation:fprise .2s ease">
+        <div class="mono" style="display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.1em;color:var(--mut)"><span style="width:6px;height:6px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 3px rgba(63,191,106,.18)"></span>{{ viewerCount }} ONLINE RIGHT NOW</div>
+        <div style="max-height:min(340px,50vh);overflow:auto">
+          <div style="display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line)">
+            <span class="mono" style="flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:10px">YOU</span>
+            <div style="min-width:0"><div style="font-size:13.5px;color:var(--ink)">You</div><div class="mono" style="font-size:10.5px;color:var(--faint)">{{ myDoing }}</div></div>
+          </div>
+          <sc-for list="{{ viewers }}" as="v" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line)">
+              <span class="mono" style="{{ v.dotStyle }}">{{ v.initials }}</span>
+              <div style="min-width:0"><div style="font-size:13.5px;color:var(--ink)">Anon · {{ v.loc }}</div><div class="mono" style="font-size:10.5px;color:var(--faint)">{{ v.doing }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div class="mono" style="padding:11px 16px;font-size:10px;color:var(--faint);line-height:1.5">Live &amp; anonymized · city from network, updates every ~15s</div>
+      </div>
+    </div>
+  </sc-if>
 
   <!-- ===== HOME ===== -->
   <header style="display:{{ vHome }};flex-direction:column;flex:1;max-width:1200px;width:100%;margin:0 auto;padding:clamp(30px,6vw,70px) clamp(18px,5vw,60px);animation:fpview .45s ease">
@@ -288,7 +310,7 @@
       <div style="position:relative;z-index:2;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px clamp(18px,5vw,60px)">
         <span class="mono" style="display:inline-flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.12em;color:var(--mut)"><span style="width:7px;height:7px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 4px rgba(63,191,106,.16)"></span>slAIve is online</span>
         <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
-          <span class="mono" style="display:inline-flex;align-items:center;gap:8px;font-size:11px;color:var(--faint)">Private · just you</span>
+          <span class="mono" style="display:inline-flex;align-items:center;gap:8px;font-size:11px;color:var(--faint)">{{ viewerCount }} online</span>
           <button onClick="{{ closePalette }}" data-cursor aria-label="close" style="flex:none;width:34px;height:34px;display:grid;place-items:center;color:var(--ink);border:1px solid var(--line2);border-radius:2px;background:transparent;cursor:pointer;font-size:15px">✕</button>
         </div>
       </div>
@@ -435,7 +457,7 @@ GUIDELINES:
   LIGHT = { '--bg': '#f4f4f2', '--paper': '#ffffff', '--ink': '#0b0b0b', '--mut': '#6a6a67', '--faint': '#a4a49f', '--line': 'rgba(11,11,11,.13)', '--line2': 'rgba(11,11,11,.26)', '--nav': 'rgba(244,244,242,.82)', '--dot': 'rgba(11,11,11,.14)' };
   DARK = { '--bg': '#0c0c0c', '--paper': '#161616', '--ink': '#f3f2ee', '--mut': '#9a9a96', '--faint': '#5e5e59', '--line': 'rgba(243,242,238,.14)', '--line2': 'rgba(243,242,238,.26)', '--nav': 'rgba(12,12,12,.82)', '--dot': 'rgba(243,242,238,.13)' };
 
-  state = { view: 'home', coinDrop: false, paletteOpen: false, resumeOpen: false, menuOpen: false, chat: [], thinking: false, time: '--:--:--', toast: '', isNarrow: false, theme: 'light', presenceOpen: false, viewers: [] };
+  state = { view: 'home', coinDrop: false, paletteOpen: false, resumeOpen: false, menuOpen: false, chat: [], thinking: false, time: '--:--:--', toast: '', isNarrow: false, theme: 'light', presenceOpen: false, viewers: [], viewerCount: 1 };
 
   VIEW_POOL = [
     { initials: 'AM', loc: 'Manila' }, { initials: 'RC', loc: 'Cebu' }, { initials: 'JT', loc: 'Singapore' },
@@ -492,11 +514,22 @@ GUIDELINES:
     window.addEventListener('keydown', this.onKey);
     this.konami = []; this.KCODE = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
     try { const th = localStorage.getItem('jeiko-theme'); this.applyTheme(th === 'dark' ? 'dark' : 'light'); } catch (e) { this.applyTheme('light'); }
+    this.vid = 'v' + Math.random().toString(36).slice(2, 10);
+    this.heartbeat(); this.hb = setInterval(() => this.heartbeat(), 15000);
   }
   componentDidUpdate() {
     if (this._pc !== this.state.chat || this._pt !== this.state.thinking) { this._pc = this.state.chat; this._pt = this.state.thinking; const b = document.getElementById('fp-askbody'); if (b) b.scrollTop = b.scrollHeight; }
   }
-  componentWillUnmount() { clearInterval(this.clock); window.removeEventListener('keydown', this.onKey); if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener('change', this.applyMq); clearTimeout(this.toastTimer); clearTimeout(this.viewTimer); }
+  componentWillUnmount() { clearInterval(this.clock); window.removeEventListener('keydown', this.onKey); if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener('change', this.applyMq); clearTimeout(this.toastTimer); clearTimeout(this.viewTimer); clearInterval(this.hb); }
+
+  heartbeat = async () => {
+    try {
+      const r = await fetch('/api/presence', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: this.vid, view: this.state.view }) });
+      if (!r.ok) throw new Error('bad');
+      const d = await r.json();
+      this.setState({ viewers: Array.isArray(d.viewers) ? d.viewers : [], viewerCount: d.count || 1 });
+    } catch (e) { this.setState({ viewers: [], viewerCount: 1 }); }
+  };
 
   tick() { try { this.setState({ time: new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Manila', hour12: false }) }); } catch (e) {} }
 
@@ -604,12 +637,14 @@ GUIDELINES:
 
     const dotBase = 'flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--bg);border:1px solid var(--line2);color:var(--mut);font-size:9.5px';
     const stackDot = (i) => `display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--paper);border:1px solid var(--line2);color:var(--mut);font-size:8.5px;margin-left:${i === 0 ? '0' : '-8px'};position:relative;z-index:${9 - i}`;
-    const viewers = s.viewers.map((v) => Object.assign({}, v, { dotStyle: dotBase }));
+    const VIEWLABEL = { home: 'on the Index', work: 'reading Projects', experience: 'on Experience', skills: 'reading Skills', recommendations: 'viewing Notes', contact: 'on Contact' };
+    const viewers = s.viewers.map((v) => Object.assign({}, v, { doing: VIEWLABEL[v.view] || 'browsing', dotStyle: dotBase }));
     const viewerStack = s.viewers.slice(0, 3).map((v, i) => ({ initials: v.initials, dotStyle: stackDot(i) }));
+    const myDoing = VIEWLABEL[s.view] || 'browsing';
 
     return {
       t: true, f: false,
-      viewers, viewerStack, viewerCount: s.viewers.length, viewerOthers: s.viewers.length,
+      viewers, viewerStack, myDoing, viewerCount: s.viewerCount, viewerOthers: Math.max(0, (s.viewerCount || 1) - 1),
       presenceOpen: s.presenceOpen, togglePresence: this.togglePresence, closePresence: this.closePresence,
       time: s.time, navItems, isNarrow: nar, notNarrow: !nar, menuOpen: s.menuOpen, menuIcon: s.menuOpen ? '✕' : '≡', toggleMenu: this.toggleMenu,
       portraitImgEl, portraitBadge: portrait.badge, portraitEmoji: portrait.emoji, portraitScrim: portrait.scrim, portraitScrimStyle: portrait.scrimStyle,

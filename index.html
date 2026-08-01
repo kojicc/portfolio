@@ -46,12 +46,12 @@
   @keyframes fpview{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
   /* ===== one-page horizontal track ===== */
   #fp-track{position:relative}
-  #fp-track[data-mode="interactive"]{display:flex;flex-direction:row;flex-wrap:nowrap;width:100%;height:100dvh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;overscroll-behavior-x:contain}
-  #fp-track[data-mode="interactive"]::-webkit-scrollbar{display:none}
-  #fp-track[data-mode="simple"]{display:block}
+  #fp-track[data-mode="interactive"]{display:flex;flex-direction:row;flex-wrap:nowrap;width:max-content;height:100dvh;transform:translateX(0);transition:transform .55s cubic-bezier(.76,0,.24,1);will-change:transform}
+  #fp-track[data-mode="simple"]{display:block;transform:none!important}
   .fp-panel{box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start;padding:70px max(clamp(18px,5vw,60px), calc((100% - 1180px)/2)) 52px}
-  #fp-track[data-mode="interactive"] .fp-panel{flex:0 0 100vw;width:100vw;height:100dvh;overflow-y:auto;overflow-x:hidden;scroll-snap-align:start}
+  #fp-track[data-mode="interactive"] .fp-panel{flex:0 0 100vw;width:100vw;height:100dvh;overflow-y:auto;overflow-x:hidden}
   #fp-track[data-mode="simple"] .fp-panel{width:100%;min-height:100dvh;border-bottom:1px solid var(--line);scroll-margin-top:64px}
+  @media (prefers-reduced-motion: reduce){#fp-track[data-mode="interactive"]{transition:none}}
   .fp-panel::-webkit-scrollbar{width:8px}.fp-panel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
   /* scroll-reveal: content is visible by default; the active panel animates in (safe if JS/binding fails) */
   @keyframes fppage{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:none}}
@@ -589,13 +589,12 @@ GUIDELINES:
       if (!track) { setTimeout(arm, 60); return; }
       track.setAttribute('data-mode', savedMode);
       track.classList.add('reveal-ready');
-      track.addEventListener('scroll', this.onTrackScroll, { passive: true });
       track.addEventListener('wheel', this.onWheel, { passive: false });
-      window.addEventListener('scroll', this.onTrackScroll, { passive: true });
-      window.addEventListener('resize', this.onTrackScroll);
+      track.addEventListener('touchstart', this.onTouchStart, { passive: true });
+      track.addEventListener('touchmove', this.onTouchMove, { passive: true });
+      track.addEventListener('touchend', this.onTouchEnd, { passive: true });
       window.addEventListener('keydown', this.onArrows);
-      this.markActive();
-      setTimeout(this.markActive, 250);
+      this.applySlide(this.state.view);
     };
     setTimeout(arm, 50);
   }
@@ -612,7 +611,7 @@ GUIDELINES:
   componentDidUpdate() {
     if (this._pc !== this.state.chat || this._pt !== this.state.thinking) { this._pc = this.state.chat; this._pt = this.state.thinking; const b = document.getElementById('fp-askbody'); if (b) b.scrollTop = b.scrollHeight; }
   }
-  componentWillUnmount() { clearInterval(this.clock); window.removeEventListener('keydown', this.onKey); window.removeEventListener('keydown', this.onArrows); window.removeEventListener('scroll', this.onTrackScroll); window.removeEventListener('resize', this.onTrackScroll); if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener('change', this.applyMq); clearTimeout(this.toastTimer); clearTimeout(this.viewTimer); clearInterval(this.hb); }
+  componentWillUnmount() { clearInterval(this.clock); window.removeEventListener('keydown', this.onKey); window.removeEventListener('keydown', this.onArrows); if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener('change', this.applyMq); clearTimeout(this.toastTimer); clearTimeout(this.viewTimer); clearInterval(this.hb); }
 
   heartbeat = async () => {
     try {
@@ -635,75 +634,73 @@ GUIDELINES:
     if (this.KCODE.every((c, i) => this.konami[i] === c)) { this.konami = []; this.toEgg(); }
   };
 
+  ORDER = ['home', 'work', 'experience', 'skills', 'recommendations', 'contact'];
   reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  go = (v) => {
-    this.setState({ view: v, menuOpen: false });
-    const el = document.querySelector('.fp-panel[data-pane="' + v + '"]');
-    if (!el) { window.scrollTo(0, 0); return; }
-    const behavior = this.reduceMotion() ? 'auto' : 'smooth';
+  applySlide = (v) => {
+    const track = document.getElementById('fp-track');
+    if (!track) return;
     if (this.state.mode === 'interactive') {
-      const track = document.getElementById('fp-track');
-      if (track) track.scrollTo({ left: el.offsetLeft, behavior });
-      el.scrollTop = 0;
+      const i = Math.max(0, this.ORDER.indexOf(v));
+      track.style.transform = 'translateX(-' + (i * 100) + 'vw)';
+    } else { track.style.transform = ''; }
+  };
+  go = (v) => {
+    if (this.ORDER.indexOf(v) < 0) v = 'home';
+    this.setState({ view: v, menuOpen: false });
+    if (this.state.mode === 'interactive') {
+      this.applySlide(v);
     } else {
-      el.scrollIntoView({ behavior, block: 'start' });
+      const el = document.querySelector('.fp-panel[data-pane="' + v + '"]');
+      if (el) el.scrollIntoView({ behavior: this.reduceMotion() ? 'auto' : 'smooth', block: 'start' });
     }
   };
+  step = (d) => {
+    const i = Math.max(0, this.ORDER.indexOf(this.state.view));
+    const ni = Math.min(this.ORDER.length - 1, Math.max(0, i + d));
+    if (ni !== i) this.go(this.ORDER[ni]);
+  };
   applyMode = (m) => {
+    this.setState({ mode: m });
     const track = document.getElementById('fp-track');
     if (track) track.setAttribute('data-mode', m);
     try { localStorage.setItem('jeiko-mode', m); } catch (e) {}
-    this.setState({ mode: m });
-    // after layout swaps, jump to the current panel and refresh active state
-    setTimeout(() => { this.go(this.state.view); this.markActive(); }, 30);
+    setTimeout(() => {
+      if (m === 'interactive') this.applySlide(this.state.view);
+      else { if (track) track.style.transform = ''; const el = document.querySelector('.fp-panel[data-pane="' + this.state.view + '"]'); if (el) el.scrollIntoView({ block: 'start' }); }
+    }, 30);
   };
   toggleMode = () => this.applyMode(this.state.mode === 'interactive' ? 'simple' : 'interactive');
 
-  markActive = () => {
-    const panels = Array.prototype.slice.call(document.querySelectorAll('.fp-panel'));
-    if (!panels.length) return;
-    let best = null, bestScore = -1;
-    const interactive = this.state.mode === 'interactive';
-    panels.forEach((p) => {
-      const r = p.getBoundingClientRect();
-      const vis = interactive
-        ? Math.max(0, Math.min(r.right, window.innerWidth) - Math.max(r.left, 0))
-        : Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
-      if (vis > bestScore) { bestScore = vis; best = p; }
-    });
-    if (best) {
-      const v = best.getAttribute('data-pane');
-      if (v && v !== this.state.view) this.setState({ view: v });
-    }
-  };
-
-  onTrackScroll = () => { if (this._raf) return; this._raf = requestAnimationFrame(() => { this._raf = 0; this.markActive(); }); };
-
   onWheel = (e) => {
     if (this.state.mode !== 'interactive') return;
-    const track = document.getElementById('fp-track');
-    if (!track) return;
     const panel = e.target && e.target.closest ? e.target.closest('.fp-panel') : null;
     const dy = e.deltaY, dx = e.deltaX;
-    if (Math.abs(dx) > Math.abs(dy)) return; // real horizontal gesture: let it be
     if (panel && panel.scrollHeight > panel.clientHeight + 2) {
       const atTop = panel.scrollTop <= 0;
       const atBottom = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1;
-      if (!((dy < 0 && atTop) || (dy > 0 && atBottom))) return; // scroll within panel first
+      if (!((dy < 0 && atTop) || (dy > 0 && atBottom))) return; // let the panel scroll vertically first
     }
     e.preventDefault();
-    track.scrollLeft += dy;
+    const now = Date.now();
+    if (now - (this._lastStep || 0) < 640) return;
+    const delta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    if (Math.abs(delta) < 6) return;
+    this._lastStep = now;
+    this.step(delta > 0 ? 1 : -1);
   };
-
   onArrows = (e) => {
     if (this.state.mode !== 'interactive') return;
     const tag = (e.target && e.target.tagName) || '';
     if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    const order = ['home', 'work', 'experience', 'skills', 'recommendations', 'contact'];
-    const i = order.indexOf(this.state.view);
-    const ni = e.key === 'ArrowRight' ? Math.min(order.length - 1, i + 1) : Math.max(0, i - 1);
-    if (ni !== i) { e.preventDefault(); this.go(order[ni]); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); this.step(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); this.step(-1); }
+  };
+  onTouchStart = (e) => { const t = e.touches ? e.touches[0] : e; this._tx = t.clientX; this._ty = t.clientY; this._tdx = 0; this._tdy = 0; };
+  onTouchMove = (e) => { if (this._tx == null) return; const t = e.touches ? e.touches[0] : e; this._tdx = t.clientX - this._tx; this._tdy = t.clientY - this._ty; };
+  onTouchEnd = () => {
+    if (this.state.mode !== 'interactive' || this._tx == null) return;
+    const dx = this._tdx || 0, dy = this._tdy || 0; this._tx = null;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) this.step(dx < 0 ? 1 : -1);
   };
   toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
   goHome = () => this.go('home'); goWork = () => this.go('work'); goContact = () => this.go('contact');

@@ -189,7 +189,34 @@
         </div>
       </div>
     </sc-for>
-    <a href="https://github.com/kojicc" target="_blank" rel="noopener" data-cursor class="mono" style="display:inline-block;margin-top:26px;font-size:13px;color:var(--ink);border-bottom:1px solid var(--ink);padding-bottom:2px">More on GitHub ↗</a>
+    <!-- ===== LIVE GIT ACTIVITY ===== -->
+    <div style="margin-top:clamp(40px,6vw,72px);border-top:1px solid var(--ink);padding-top:22px">
+      <div class="mono" style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;color:var(--mut)"><span style="width:6px;height:6px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 3px rgba(63,191,106,.18)"></span>LIVE · GIT ACTIVITY</div>
+      <h3 class="disp" style="margin:8px 0 0;font-size:clamp(24px,3.4vw,40px)">Recent commits</h3>
+      <p style="margin:10px 0 0;font-size:14.5px;line-height:1.55;max-width:520px;color:var(--mut);text-wrap:pretty">Pulled straight from my GitHub — this refreshes itself every time I push, so it's always the real state of what I'm building.</p>
+      <div style="margin-top:22px;border:1px solid var(--line2);background:var(--paper);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:1px solid var(--line)">
+          <span style="display:flex;gap:5px"><span style="width:8px;height:8px;border-radius:50%;border:1px solid var(--line2)"></span><span style="width:8px;height:8px;border-radius:50%;border:1px solid var(--line2)"></span><span style="width:8px;height:8px;border-radius:50%;border:1px solid var(--line2)"></span></span>
+          <span class="mono" style="flex:1;text-align:center;font-size:10px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">git log --author=kojicc</span>
+        </div>
+        <div style="max-height:380px;overflow:auto">
+          <sc-if value="{{ commitsLoading }}" hint-placeholder-val="{{ t }}">
+            <div class="mono" style="padding:22px 15px;font-size:12px;color:var(--faint)">fetching latest commits…</div>
+          </sc-if>
+          <sc-if value="{{ commitsEmpty }}" hint-placeholder-val="{{ f }}">
+            <div class="mono" style="padding:22px 15px;font-size:12px;color:var(--faint)">Couldn't reach GitHub right now — <a href="https://github.com/kojicc" target="_blank" rel="noopener" data-cursor style="color:var(--ink);border-bottom:1px solid var(--ink)">browse it directly ↗</a></div>
+          </sc-if>
+          <sc-for list="{{ commitRows }}" as="c" hint-placeholder-count="8">
+            <a href="{{ c.url }}" target="_blank" rel="noopener" data-cursor style="{{ c.rowStyle }}">
+              <span class="mono" style="flex:none;font-size:11.5px;color:#3fbf6a">{{ c.sha }}</span>
+              <span style="min-width:0;flex:1"><span style="display:block;font-size:13.5px;color:var(--ink);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.msg }}</span><span class="mono" style="font-size:10.5px;color:var(--faint)">{{ c.repo }}</span></span>
+              <span class="mono" style="flex:none;font-size:10.5px;color:var(--mut)">{{ c.ago }}</span>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+      <a href="https://github.com/kojicc" target="_blank" rel="noopener" data-cursor class="mono" style="display:inline-block;margin-top:18px;font-size:13px;color:var(--ink);border-bottom:1px solid var(--ink);padding-bottom:2px">Browse all repos on GitHub ↗</a>
+    </div>
     <div style="margin-top:clamp(40px,6vw,72px);border-top:1px solid var(--ink);padding-top:22px">
       <div class="mono" style="font-size:11px;letter-spacing:.14em;color:var(--mut)">ROADMAP</div>
       <h3 class="disp" style="margin:8px 0 0;font-size:clamp(24px,3.4vw,40px)">What's next</h3>
@@ -457,7 +484,7 @@ GUIDELINES:
   LIGHT = { '--bg': '#f4f4f2', '--paper': '#ffffff', '--ink': '#0b0b0b', '--mut': '#6a6a67', '--faint': '#a4a49f', '--line': 'rgba(11,11,11,.13)', '--line2': 'rgba(11,11,11,.26)', '--nav': 'rgba(244,244,242,.82)', '--dot': 'rgba(11,11,11,.14)' };
   DARK = { '--bg': '#0c0c0c', '--paper': '#161616', '--ink': '#f3f2ee', '--mut': '#9a9a96', '--faint': '#5e5e59', '--line': 'rgba(243,242,238,.14)', '--line2': 'rgba(243,242,238,.26)', '--nav': 'rgba(12,12,12,.82)', '--dot': 'rgba(243,242,238,.13)' };
 
-  state = { view: 'home', coinDrop: false, paletteOpen: false, resumeOpen: false, menuOpen: false, chat: [], thinking: false, time: '--:--:--', toast: '', isNarrow: false, theme: 'light', presenceOpen: false, viewers: [], viewerCount: 1, visitorsToday: 1 };
+  state = { view: 'home', coinDrop: false, paletteOpen: false, resumeOpen: false, menuOpen: false, chat: [], thinking: false, time: '--:--:--', toast: '', isNarrow: false, theme: 'light', presenceOpen: false, viewers: [], viewerCount: 1, visitorsToday: 1, commits: [], commitsStatus: 'loading' };
 
   VIEW_POOL = [
     { initials: 'AM', loc: 'Manila' }, { initials: 'RC', loc: 'Cebu' }, { initials: 'JT', loc: 'Singapore' },
@@ -517,7 +544,31 @@ GUIDELINES:
     this.vid = 'v' + Math.random().toString(36).slice(2, 10);
     try { let p = localStorage.getItem('jeiko-visitor'); if (!p) { p = 'p' + Math.random().toString(36).slice(2, 12); localStorage.setItem('jeiko-visitor', p); } this.pid = p; } catch (e) { this.pid = 'p' + Math.random().toString(36).slice(2, 12); }
     this.heartbeat(); this.hb = setInterval(() => this.heartbeat(), 5000);
+    this.loadCommits();
   }
+
+  loadCommits = async () => {
+    try {
+      const r = await fetch('/api/github');
+      if (!r.ok) throw new Error('bad');
+      const d = await r.json();
+      const list = Array.isArray(d.commits) ? d.commits : [];
+      this.setState({ commits: list, commitsStatus: list.length ? 'ready' : 'empty' });
+    } catch (e) { this.setState({ commits: [], commitsStatus: 'empty' }); }
+  };
+
+  timeAgo = (iso) => {
+    const then = new Date(iso).getTime();
+    if (!then) return '';
+    const s = Math.max(0, Math.floor((Date.now() - then) / 1000));
+    if (s < 60) return 'just now';
+    const m = Math.floor(s / 60); if (m < 60) return m + 'm ago';
+    const h = Math.floor(m / 60); if (h < 24) return h + 'h ago';
+    const d = Math.floor(h / 24); if (d < 7) return d + 'd ago';
+    const w = Math.floor(d / 7); if (w < 5) return w + 'w ago';
+    const mo = Math.floor(d / 30); if (mo < 12) return mo + 'mo ago';
+    return Math.floor(d / 365) + 'y ago';
+  };
   componentDidUpdate() {
     if (this._pc !== this.state.chat || this._pt !== this.state.thinking) { this._pc = this.state.chat; this._pt = this.state.thinking; const b = document.getElementById('fp-askbody'); if (b) b.scrollTop = b.scrollHeight; }
   }
@@ -643,6 +694,11 @@ GUIDELINES:
     const viewerStack = s.viewers.slice(0, 3).map((v, i) => ({ initials: v.initials, dotStyle: stackDot(i) }));
     const myDoing = VIEWLABEL[s.view] || 'browsing';
 
+    const commitRow = 'display:flex;align-items:center;gap:14px;padding:12px 15px;border-bottom:1px solid var(--line);text-decoration:none';
+    const commitRows = (s.commits || []).map((c) => ({
+      repo: c.repo, msg: c.message, sha: c.sha, url: c.url, ago: this.timeAgo(c.date), rowStyle: commitRow,
+    }));
+
     return {
       t: true, f: false,
       viewers, viewerStack, myDoing, viewerCount: s.viewerCount, visitorsToday: s.visitorsToday || 1, viewerOthers: Math.max(0, (s.viewerCount || 1) - 1),
@@ -663,6 +719,7 @@ GUIDELINES:
       heroAsideStyle: nar ? 'max-width:300px' : '',
       contactGridStyle: nar ? 'display:grid;grid-template-columns:1fr;gap:34px' : 'display:grid;grid-template-columns:1fr minmax(0,380px);gap:clamp(30px,6vw,80px);align-items:start',
       projects, experience, skills, recs, roadmap,
+      commitRows, commitsLoading: s.commitsStatus === 'loading', commitsEmpty: s.commitsStatus === 'empty', hasCommits: s.commitsStatus === 'ready',
       suggestions, chat, noChat: s.chat.length === 0,
       paletteOpen: s.paletteOpen, resumeOpen: s.resumeOpen, toast: s.toast,
       themeIcon: s.theme === 'light' ? '☾' : '☀', toggleTheme: this.toggleTheme,

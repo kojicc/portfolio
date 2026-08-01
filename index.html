@@ -46,12 +46,13 @@
   @keyframes fpview{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
   /* ===== one-page horizontal track ===== */
   #fp-track{position:relative}
-  #fp-track[data-mode="interactive"]{display:flex;flex-direction:row;flex-wrap:nowrap;width:max-content;height:100dvh;transform:translateX(0);transition:transform .55s cubic-bezier(.76,0,.24,1);will-change:transform}
-  #fp-track[data-mode="simple"]{display:block;transform:none!important}
+  #fp-track[data-mode="interactive"]{position:relative;width:100vw;height:100dvh;overflow:hidden}
+  #fp-track[data-mode="simple"]{display:block}
   .fp-panel{box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start;padding:70px max(clamp(18px,5vw,60px), calc((100% - 1180px)/2)) 52px}
-  #fp-track[data-mode="interactive"] .fp-panel{flex:0 0 100vw;width:100vw;height:100dvh;overflow-y:auto;overflow-x:hidden}
-  #fp-track[data-mode="simple"] .fp-panel{width:100%;min-height:100dvh;border-bottom:1px solid var(--line);scroll-margin-top:64px}
-  @media (prefers-reduced-motion: reduce){#fp-track[data-mode="interactive"]{transition:none}}
+  #fp-track[data-mode="interactive"] .fp-panel{position:absolute;top:0;left:0;width:100vw;height:100dvh;overflow-y:auto;overflow-x:hidden;transform:translateX(100vw);transition:transform .55s cubic-bezier(.76,0,.24,1);will-change:transform}
+  #fp-track[data-mode="interactive"] .fp-panel[data-pane="home"]{transform:translateX(0)}
+  #fp-track[data-mode="simple"] .fp-panel{position:static;transform:none!important;width:100%;min-height:100dvh;border-bottom:1px solid var(--line);scroll-margin-top:64px}
+  @media (prefers-reduced-motion: reduce){#fp-track[data-mode="interactive"] .fp-panel{transition:none}}
   .fp-panel::-webkit-scrollbar{width:8px}.fp-panel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
   /* scroll-reveal: content is visible by default; the active panel animates in (safe if JS/binding fails) */
   @keyframes fppage{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:none}}
@@ -639,10 +640,13 @@ GUIDELINES:
   applySlide = (v) => {
     const track = document.getElementById('fp-track');
     if (!track) return;
+    const panels = track.querySelectorAll('.fp-panel');
     if (this.state.mode === 'interactive') {
-      const i = Math.max(0, this.ORDER.indexOf(v));
-      track.style.transform = 'translateX(-' + (i * 100) + 'vw)';
-    } else { track.style.transform = ''; }
+      const c = Math.max(0, this.ORDER.indexOf(v));
+      panels.forEach((p) => { const k = this.ORDER.indexOf(p.getAttribute('data-pane')); p.style.transform = 'translateX(' + ((k - c) * 100) + 'vw)'; });
+    } else {
+      panels.forEach((p) => { p.style.transform = ''; });
+    }
   };
   go = (v) => {
     if (this.ORDER.indexOf(v) < 0) v = 'home';

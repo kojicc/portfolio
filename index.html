@@ -49,8 +49,9 @@
   #fp-track[data-mode="interactive"]{position:relative;width:100vw;height:100dvh;overflow:hidden}
   #fp-track[data-mode="simple"]{display:block}
   .fp-panel{box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start;padding:70px max(clamp(18px,5vw,60px), calc((100% - 1180px)/2)) 52px}
-  #fp-track[data-mode="interactive"] .fp-panel{position:absolute;top:0;left:0;width:100vw;height:100dvh;overflow-y:auto;overflow-x:hidden;transform:translateX(100vw);transition:transform .55s cubic-bezier(.76,0,.24,1);will-change:transform}
-  #fp-track[data-mode="interactive"] .fp-panel[data-pane="home"]{transform:translateX(0)}
+  .fp-panel[data-pane="home"]{--k:0}.fp-panel[data-pane="work"]{--k:1}.fp-panel[data-pane="experience"]{--k:2}.fp-panel[data-pane="skills"]{--k:3}.fp-panel[data-pane="recommendations"]{--k:4}.fp-panel[data-pane="contact"]{--k:5}
+  #fp-track[data-view="home"]{--c:0}#fp-track[data-view="work"]{--c:1}#fp-track[data-view="experience"]{--c:2}#fp-track[data-view="skills"]{--c:3}#fp-track[data-view="recommendations"]{--c:4}#fp-track[data-view="contact"]{--c:5}
+  #fp-track[data-mode="interactive"] .fp-panel{position:absolute;top:0;left:0;width:100vw;height:100dvh;overflow-y:auto;overflow-x:hidden;transform:translateX(calc((var(--k) - var(--c,0)) * 100vw));transition:transform .55s cubic-bezier(.76,0,.24,1);will-change:transform}
   #fp-track[data-mode="simple"] .fp-panel{position:static;transform:none!important;width:100%;min-height:100dvh;border-bottom:1px solid var(--line);scroll-margin-top:64px}
   @media (prefers-reduced-motion: reduce){#fp-track[data-mode="interactive"] .fp-panel{transition:none}}
   .fp-panel::-webkit-scrollbar{width:8px}.fp-panel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
@@ -124,7 +125,7 @@
     </div>
   </sc-if>
 
-  <div id="fp-track" data-mode="{{ mode }}">
+  <div id="fp-track" data-mode="{{ mode }}" data-view="{{ viewName }}">
 
   <!-- ===== HOME ===== -->
   <header class="fp-panel {{ homeActive }}" data-pane="home" data-view-pane>
@@ -595,7 +596,6 @@ GUIDELINES:
       track.addEventListener('touchmove', this.onTouchMove, { passive: true });
       track.addEventListener('touchend', this.onTouchEnd, { passive: true });
       window.addEventListener('keydown', this.onArrows);
-      this.applySlide(this.state.view);
     };
     setTimeout(arm, 50);
   }
@@ -637,23 +637,11 @@ GUIDELINES:
 
   ORDER = ['home', 'work', 'experience', 'skills', 'recommendations', 'contact'];
   reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  applySlide = (v) => {
-    const track = document.getElementById('fp-track');
-    if (!track) return;
-    const panels = track.querySelectorAll('.fp-panel');
-    if (this.state.mode === 'interactive') {
-      const c = Math.max(0, this.ORDER.indexOf(v));
-      panels.forEach((p) => { const k = this.ORDER.indexOf(p.getAttribute('data-pane')); p.style.transform = 'translateX(' + ((k - c) * 100) + 'vw)'; });
-    } else {
-      panels.forEach((p) => { p.style.transform = ''; });
-    }
-  };
   go = (v) => {
     if (this.ORDER.indexOf(v) < 0) v = 'home';
     this.setState({ view: v, menuOpen: false });
-    if (this.state.mode === 'interactive') {
-      this.applySlide(v);
-    } else {
+    // interactive: CSS slides panels via the track's data-view attribute (no JS transform).
+    if (this.state.mode !== 'interactive') {
       const el = document.querySelector('.fp-panel[data-pane="' + v + '"]');
       if (el) el.scrollIntoView({ behavior: this.reduceMotion() ? 'auto' : 'smooth', block: 'start' });
     }
@@ -668,10 +656,7 @@ GUIDELINES:
     const track = document.getElementById('fp-track');
     if (track) track.setAttribute('data-mode', m);
     try { localStorage.setItem('jeiko-mode', m); } catch (e) {}
-    setTimeout(() => {
-      if (m === 'interactive') this.applySlide(this.state.view);
-      else { if (track) track.style.transform = ''; const el = document.querySelector('.fp-panel[data-pane="' + this.state.view + '"]'); if (el) el.scrollIntoView({ block: 'start' }); }
-    }, 30);
+    if (m === 'simple') setTimeout(() => { const el = document.querySelector('.fp-panel[data-pane="' + this.state.view + '"]'); if (el) el.scrollIntoView({ block: 'start' }); }, 40);
   };
   toggleMode = () => this.applyMode(this.state.mode === 'interactive' ? 'simple' : 'interactive');
 
@@ -844,7 +829,7 @@ GUIDELINES:
       contactGridStyle: nar ? 'display:grid;grid-template-columns:1fr;gap:34px' : 'display:grid;grid-template-columns:1fr minmax(0,380px);gap:clamp(30px,6vw,80px);align-items:start',
       projects, experience, education, skills, recs, roadmap,
       contribWeeks, contribTotal: s.contribTotal || 0, activityLoading: s.activityStatus === 'loading', activityEmpty: s.activityStatus === 'empty',
-      mode: s.mode, toggleMode: this.toggleMode,
+      mode: s.mode, viewName: s.view, toggleMode: this.toggleMode,
       modeIcon: s.mode === 'interactive' ? '⇄' : '▤',
       modeLabel: s.mode === 'interactive' ? 'Interactive' : 'Simple',
       modeTitle: s.mode === 'interactive' ? 'Switch to a simple vertical layout' : 'Switch to the interactive one-page layout',

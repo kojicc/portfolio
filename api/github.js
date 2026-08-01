@@ -1,18 +1,14 @@
-// Live GitHub commit feed for the portfolio.
-// GitHub's public /events feed returns a stripped push payload for this account
-// (no commit messages), so instead we list the user's most-recently-pushed
-// public repos and pull the latest commits from each, then merge newest-first.
-// Result is cached in Upstash (~15 min) to stay well inside GitHub's
-// unauthenticated rate limit (~6 API calls per cache miss). Works with no env
-// vars; optionally set GITHUB_TOKEN (higher limit) and GITHUB_USER.
-// Returns: { commits: [{repo, message, sha, url, date}], cached }.
+// Live GitHub contribution graph for the portfolio.
+// Returns the last ~year of daily contribution activity (the "squares"): each
+// day has a date, a commit/contribution count, and an intensity level 0-4.
+// Data comes from the public contributions API (mirrors GitHub's own graph),
+// cached in Upstash (~30 min) so the page loads instantly and we stay light.
+// Works with no env vars; optionally set GITHUB_USER.
+// Returns: { days: [{date, count, level}], total, cached }.
 
 const USER = process.env.GITHUB_USER || 'kojicc';
-const CACHE_KEY = 'gh:commits:v2:' + USER;
-const CACHE_TTL = 900;      // seconds
-const REPOS_TO_SCAN = 5;    // how many recently-pushed repos to look at
-const COMMITS_PER_REPO = 5;
-const MAX_COMMITS = 14;
+const CACHE_KEY = 'gh:contrib:' + USER;
+const CACHE_TTL = 1800; // seconds
 
 module.exports = async function handler(req, res) {
   const R_URL = process.env.UPSTASH_REDIS_REST_URL;
@@ -28,24 +24,13 @@ module.exports = async function handler(req, res) {
     return d && d.result;
   }
 
-  const gh = {
-    'User-Agent': 'jeiko-portfolio',
-    Accept: 'application/vnd.github+json',
-  };
-  if (process.env.GITHUB_TOKEN) gh.Authorization = 'Bearer ' + process.env.GITHUB_TOKEN;
-  const ghGet = async (path) => {
-    const r = await fetch('https://api.github.com' + path, { headers: gh });
-    if (!r.ok) throw new Error('github ' + r.status + ' ' + path);
-    return r.json();
-  };
-
   // 1) cache
   if (R_URL && R_TOK) {
     try {
       const hit = await redis(['GET', CACHE_KEY]);
       if (hit) {
-        res.setHeader('cache-control', 'public, max-age=120');
-        res.status(200).json({ commits: JSON.parse(hit), cached: true });
+        res.setHeader('cache-control', 'public, max-age=300');
+        res.status(200).json(Object.assign(JSON.parse(hit), { cached: true }));
         return;
       }
     } catch (e) { /* fall through */ }
@@ -53,48 +38,24 @@ module.exports = async function handler(req, res) {
 
   // 2) fresh
   try {
-    const repos = await ghGet('/users/' + USER + '/repos?sort=pushed&direction=desc&per_page=' + REPOS_TO_SCAN + '&type=owner');
-    const top = (Array.isArray(repos) ? repos : []).filter((r) => r && !r.fork).slice(0, REPOS_TO_SCAN);
-
-    const perRepo = await Promise.all(top.map(async (r) => {
-      try {
-        const list = await ghGet('/repos/' + r.full_name + '/commits?per_page=' + COMMITS_PER_REPO);
-        return (Array.isArray(list) ? list : []).map((it) => ({
-          repo: r.name,
-          full: r.full_name,
-          sha: it.sha,
-          message: ((it.commit && it.commit.message) || '').split('\n')[0].trim(),
-          date: (it.commit && it.commit.author && it.commit.author.date) || (it.commit && it.commit.committer && it.commit.committer.date) || '',
-          url: it.html_url,
-        }));
-      } catch (e) { return []; }
+    const r = await fetch('https://github-contributions-api.jogruber.de/v4/' + encodeURIComponent(USER) + '?y=last', {
+      headers: { 'User-Agent': 'jeiko-portfolio', Accept: 'application/json' },
+    });
+    if (!r.ok) { res.status(200).json({ days: [], total: 0, cached: false, error: 'source ' + r.status }); return; }
+    const j = await r.json();
+    const days = (Array.isArray(j.contributions) ? j.contributions : []).map((d) => ({
+      date: d.date, count: d.count || 0, level: typeof d.level === 'number' ? d.level : 0,
     }));
+    const total = (j.total && (j.total.lastYear != null ? j.total.lastYear : Object.values(j.total).reduce((a, b) => a + b, 0)))
+      || days.reduce((a, d) => a + d.count, 0);
 
-    const seen = new Set();
-    const commits = [];
-    perRepo.flat()
-      .filter((c) => c.sha && c.message && !/^merge\b/i.test(c.message))
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .forEach((c) => {
-        if (seen.has(c.sha)) return;
-        seen.add(c.sha);
-        commits.push({
-          repo: c.repo,
-          message: c.message.length > 84 ? c.message.slice(0, 83) + '…' : c.message,
-          sha: c.sha.slice(0, 7),
-          url: c.url,
-          date: c.date,
-        });
-      });
-
-    const out = commits.slice(0, MAX_COMMITS);
-    if (R_URL && R_TOK && out.length) {
-      try { await redis(['SET', CACHE_KEY, JSON.stringify(out), 'EX', CACHE_TTL]); } catch (e) {}
+    const payload = { days, total };
+    if (R_URL && R_TOK && days.length) {
+      try { await redis(['SET', CACHE_KEY, JSON.stringify(payload), 'EX', CACHE_TTL]); } catch (e) {}
     }
-
-    res.setHeader('cache-control', 'public, max-age=120');
-    res.status(200).json({ commits: out, cached: false });
+    res.setHeader('cache-control', 'public, max-age=300');
+    res.status(200).json(Object.assign(payload, { cached: false }));
   } catch (e) {
-    res.status(200).json({ commits: [], cached: false, error: String(e && e.message || e) });
+    res.status(200).json({ days: [], total: 0, cached: false, error: String(e && e.message || e) });
   }
 };

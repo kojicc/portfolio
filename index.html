@@ -44,9 +44,22 @@
   @keyframes fpblink{0%,49%{opacity:1}50%,100%{opacity:0}}
   @keyframes fpdot{0%,80%,100%{opacity:.25}40%{opacity:1}}
   @keyframes fpview{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-  @keyframes fppage{0%{opacity:0;transform:translateY(14px) scale(.994);filter:blur(3px)}60%{filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
-  [data-view-pane]{animation:fppage .5s cubic-bezier(.22,.61,.36,1) both;will-change:opacity,transform,filter}
-  @media (prefers-reduced-motion: reduce){[data-view-pane]{animation:none!important;filter:none!important}}
+  /* ===== one-page horizontal track ===== */
+  #fp-track{position:relative}
+  #fp-track[data-mode="interactive"]{display:flex;flex-direction:row;flex-wrap:nowrap;width:100%;height:100dvh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;overscroll-behavior-x:contain}
+  #fp-track[data-mode="interactive"]::-webkit-scrollbar{display:none}
+  #fp-track[data-mode="simple"]{display:block}
+  .fp-panel{box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start;padding:70px max(clamp(18px,5vw,60px), calc((100% - 1180px)/2)) 52px}
+  #fp-track[data-mode="interactive"] .fp-panel{flex:0 0 100vw;width:100vw;height:100dvh;overflow-y:auto;overflow-x:hidden;scroll-snap-align:start}
+  #fp-track[data-mode="simple"] .fp-panel{width:100%;min-height:100dvh;border-bottom:1px solid var(--line);scroll-margin-top:64px}
+  .fp-panel::-webkit-scrollbar{width:8px}.fp-panel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
+  /* scroll-reveal: content is visible by default; the active panel animates in (safe if JS/binding fails) */
+  @keyframes fppage{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:none}}
+  #fp-track.reveal-ready .fp-panel.is-active>*{animation:fppage .55s cubic-bezier(.22,.61,.36,1) both}
+  #fp-track.reveal-ready .fp-panel.is-active>*:nth-child(2){animation-delay:.05s}
+  #fp-track.reveal-ready .fp-panel.is-active>*:nth-child(3){animation-delay:.1s}
+  #fp-track.reveal-ready .fp-panel.is-active>*:nth-child(n+4){animation-delay:.15s}
+  @media (prefers-reduced-motion: reduce){#fp-track{scroll-behavior:auto}#fp-track.reveal-ready .fp-panel.is-active>*{animation:none!important}}
   @keyframes fpthemespin{from{transform:rotate(-90deg) scale(.6);opacity:0}to{transform:none;opacity:1}}
   .fp-theme-icon{display:inline-block;animation:fpthemespin .45s cubic-bezier(.34,1.56,.64,1)}
   @keyframes fpcoin{0%{transform:translate(-50%,-210px) rotateY(0deg) scale(1);opacity:0}12%{opacity:1}62%{transform:translate(-50%,-4px) rotateY(760deg) scale(1)}72%{transform:translate(-50%,-22px) rotateY(880deg) scale(1)}88%{transform:translate(-50%,-2px) rotateY(1040deg) scale(1)}100%{transform:translate(-50%,10px) rotateY(1120deg) scale(.34);opacity:0}}
@@ -60,7 +73,7 @@
 <div id="fp-root" style="--bg:#f4f4f2;--paper:#ffffff;--ink:#0b0b0b;--mut:#6a6a67;--faint:#a4a49f;--line:rgba(11,11,11,.13);--line2:rgba(11,11,11,.26);--nav:rgba(244,244,242,.82);--dot:rgba(11,11,11,.14);--ghempty:rgba(11,11,11,.07);position:relative;min-width:0;min-height:100dvh;display:flex;flex-direction:column;background-color:var(--bg);background-image:radial-gradient(var(--dot) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);overflow-x:clip">
 
   <!-- ===== NAV ===== -->
-  <nav style="position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:14px 20px;flex-wrap:wrap;padding:12px clamp(18px,5vw,60px);background:var(--nav);backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);border-bottom:1px solid var(--line)">
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:14px 20px;flex-wrap:wrap;padding:12px clamp(18px,5vw,60px);background:var(--nav);backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05);border-bottom:1px solid var(--line)">
     <button onClick="{{ goHome }}" data-cursor style="display:flex;align-items:center;gap:12px;background:none;border:0;cursor:pointer;padding:0;color:var(--ink)">
       <span class="disp" style="display:grid;place-items:center;width:36px;height:36px;background:var(--ink);color:var(--bg);border-radius:2px;font-size:16px;font-weight:800">JS</span>
       <span class="mono" style="font-size:13px;letter-spacing:.02em;color:var(--ink)">jeiko sy</span>
@@ -77,6 +90,7 @@
       <sc-if value="{{ notNarrow }}" hint-placeholder-val="{{ t }}">
         <button onClick="{{ togglePresence }}" data-cursor aria-label="who's viewing" title="Who's viewing" style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:transparent;border:1px solid var(--line2);border-radius:2px;cursor:pointer;color:var(--mut)"><span style="width:6px;height:6px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 3px rgba(63,191,106,.18)"></span><span class="mono" style="font-size:11.5px">{{ viewerCount }} online</span></button>
       </sc-if>
+      <button onClick="{{ toggleMode }}" data-cursor aria-label="toggle layout" title="{{ modeTitle }}" style="height:38px;flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;padding:0 12px;background:transparent;border:1px solid var(--line2);border-radius:2px;color:var(--ink);font-size:14px;cursor:pointer"><span style="font-size:15px;line-height:1">{{ modeIcon }}</span><span class="mono" style="font-size:10.5px;letter-spacing:.04em;color:var(--mut)">{{ modeLabel }}</span></button>
       <button onClick="{{ toggleTheme }}" data-cursor aria-label="toggle theme" title="Toggle theme" style="width:38px;height:38px;flex:0 0 auto;display:grid;place-items:center;background:transparent;border:1px solid var(--line2);border-radius:2px;color:var(--ink);font-size:14px;cursor:pointer;overflow:hidden"><span class="fp-theme-icon" key="{{ themeIcon }}">{{ themeIcon }}</span></button>
       <sc-if value="{{ notNarrow }}" hint-placeholder-val="{{ t }}">
         <button onClick="{{ openPalette }}" data-cursor class="mono" style="display:inline-flex;align-items:center;gap:9px;padding:9px 14px;background:var(--ink);border:1px solid var(--ink);border-radius:2px;color:var(--bg);font-size:12px;cursor:pointer">slAIve <span style="opacity:.6">⌘K</span></button>
@@ -109,9 +123,11 @@
     </div>
   </sc-if>
 
+  <div id="fp-track" data-mode="{{ mode }}">
+
   <!-- ===== HOME ===== -->
-  <header style="display:{{ vHome }};flex-direction:column;flex:1;max-width:1200px;width:100%;margin:0 auto;padding:clamp(30px,6vw,70px) clamp(18px,5vw,60px)" data-view-pane>
-    <div class="mono" style="display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:var(--mut);border-bottom:1px solid var(--line);padding-bottom:18px">
+  <header class="fp-panel {{ homeActive }}" data-pane="home" data-view-pane>
+    <div class="mono" style="display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:var(--mut);border-bottom:1px solid var(--line);padding-bottom:12px">
       <span style="display:inline-flex;align-items:center;gap:8px"><span style="width:7px;height:7px;border-radius:50%;background:var(--ink)"></span>Open to work</span>
       <span>Full stack developer</span>
       <span>General Trias, Cavite</span>
@@ -119,16 +135,16 @@
     </div>
     <div style="{{ heroGridStyle }}" data-hero-grid>
       <div style="min-width:0;display:flex;flex-direction:column;animation:fprise .55s ease">
-        <h1 class="disp" style="margin:clamp(16px,3vw,30px) 0 0;font-size:clamp(46px,8.4vw,118px)">I build software that clears the busywork.</h1>
-        <p style="margin:clamp(22px,3vw,30px) 0 0;font-size:clamp(16px,1.9vw,19px);line-height:1.55;max-width:520px;color:var(--mut);text-wrap:pretty">Full stack developer building Cast LMS at Buri Technologies. I design and ship web apps end to end, turning slow manual work into systems people trust.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:clamp(24px,3vw,34px)">
+        <h1 class="disp" style="margin:clamp(8px,1.6vw,16px) 0 0;font-size:clamp(30px,4.7vw,62px);line-height:1.02">I build software that clears the busywork.</h1>
+        <p style="margin:clamp(12px,1.8vw,18px) 0 0;font-size:clamp(14px,1.4vw,16.5px);line-height:1.5;max-width:500px;color:var(--mut);text-wrap:pretty">Full stack developer building Cast LMS at Buri Technologies. I design and ship web apps end to end, turning slow manual work into systems people trust.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:clamp(16px,2vw,24px)">
           <button onClick="{{ goWork }}" data-cursor class="mono" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;background:var(--ink);color:var(--bg);border:0;border-radius:2px;font-size:13px;cursor:pointer">See the work →</button>
           <button onClick="{{ openResume }}" data-cursor class="mono" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:2px;font-size:13px;cursor:pointer">Résumé</button>
           <button onClick="{{ goContact }}" data-cursor class="mono" style="display:inline-flex;align-items:center;gap:9px;padding:14px 22px;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:2px;font-size:13px;cursor:pointer">Contact</button>
         </div>
       </div>
       <div style="{{ heroAsideStyle }}">
-        <div style="position:relative;height:100%;min-height:clamp(320px,50vh,540px);overflow:hidden;border:1px solid var(--line2);background:var(--paper)">
+        <div style="position:relative;height:100%;min-height:clamp(200px,32vh,360px);overflow:hidden;border:1px solid var(--line2);background:var(--paper)">
           {{ portraitImgEl }}
           <sc-if value="{{ portraitScrim }}" hint-placeholder-val="{{ f }}"><div aria-hidden="true" style="{{ portraitScrimStyle }}"></div></sc-if>
           <sc-if value="{{ portraitEmoji }}" hint-placeholder-val="{{ f }}"><div aria-hidden="true" style="position:absolute;top:12px;right:14px;font-size:30px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))">{{ portraitEmoji }}</div></sc-if>
@@ -136,13 +152,13 @@
         </div>
       </div>
     </div>
-    <div class="mono" style="display:flex;flex-wrap:wrap;gap:8px 0;font-size:12px;color:var(--mut);border-top:1px solid var(--line2);margin-top:clamp(26px,3vw,40px)">
+    <div class="mono" style="display:flex;flex-wrap:wrap;gap:8px 0;font-size:12px;color:var(--mut);border-top:1px solid var(--line2);margin-top:clamp(12px,1.8vw,18px)">
       <span style="flex:1;min-width:150px;display:flex;justify-content:space-between;gap:10px;padding:13px 18px 13px 0;border-right:1px solid var(--line)"><span>Now</span><span style="color:var(--ink)">Buri Technologies</span></span>
       <span style="flex:1;min-width:150px;display:flex;justify-content:space-between;gap:10px;padding:13px 18px;border-right:1px solid var(--line)"><span>Degree</span><span style="color:var(--ink)">BS IT · 3.79</span></span>
       <span style="flex:1;min-width:150px;display:flex;justify-content:space-between;gap:10px;padding:13px 18px"><span>Focus</span><span style="color:var(--ink)">Full stack · automation</span></span>
     </div>
     <!-- ===== LIVE GITHUB CONTRIBUTION GRAPH ===== -->
-    <div style="margin-top:clamp(22px,3vw,34px);border-top:1px solid var(--line2);padding-top:18px">
+    <div style="margin-top:clamp(12px,1.8vw,18px);border-top:1px solid var(--line2);padding-top:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
         <div class="mono" style="display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.1em;color:var(--mut)"><span style="width:6px;height:6px;border-radius:50%;background:#3fbf6a;box-shadow:0 0 0 3px rgba(63,191,106,.18)"></span>LIVE · GITHUB · <span style="color:var(--ink)">{{ contribTotal }}</span> contributions this year</div>
         <a href="https://github.com/kojicc" target="_blank" rel="noopener" data-cursor class="mono" style="flex:none;font-size:12px;color:var(--ink);border-bottom:1px solid var(--ink);padding-bottom:2px">@kojicc ↗</a>
@@ -177,7 +193,7 @@
   </header>
 
   <!-- ===== WORK ===== -->
-  <main style="display:{{ vWork }};flex:1;max-width:1200px;width:100%;margin:0 auto;padding:clamp(30px,5vw,56px) clamp(18px,5vw,60px)" data-view-pane>
+  <main class="fp-panel {{ workActive }}" data-pane="work" data-view-pane>
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:16px">
       <h2 class="disp" style="margin:0;font-size:clamp(34px,6vw,72px)">Projects</h2>
       <span class="mono" style="font-size:12px;color:var(--mut)">5 projects / 2024 to 26</span>
@@ -250,7 +266,7 @@
   </main>
 
   <!-- ===== EXPERIENCE ===== -->
-  <main style="display:{{ vExp }};flex:1;max-width:1200px;width:100%;margin:0 auto;padding:clamp(30px,5vw,56px) clamp(18px,5vw,60px)" data-view-pane>
+  <main class="fp-panel {{ experienceActive }}" data-pane="experience" data-view-pane>
     <h2 class="disp" style="margin:0 0 16px;font-size:clamp(34px,6vw,72px);border-bottom:1px solid var(--ink);padding-bottom:16px">Experience</h2>
     <sc-for list="{{ experience }}" as="e" hint-placeholder-count="3">
       <div style="{{ e.rowStyle }}" data-exp-row>
@@ -276,7 +292,7 @@
   </main>
 
   <!-- ===== SKILLS ===== -->
-  <main style="display:{{ vSkills }};flex:1;max-width:1200px;width:100%;margin:0 auto;padding:clamp(30px,5vw,56px) clamp(18px,5vw,60px)" data-view-pane>
+  <main class="fp-panel {{ skillsActive }}" data-pane="skills" data-view-pane>
     <h2 class="disp" style="margin:0 0 16px;font-size:clamp(34px,6vw,72px);border-bottom:1px solid var(--ink);padding-bottom:16px">Skills</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
       <sc-for list="{{ skills }}" as="g" hint-placeholder-count="4">
@@ -293,7 +309,7 @@
   </main>
 
   <!-- ===== RECOMMENDATIONS ===== -->
-  <main style="display:{{ vRecs }};flex:1;max-width:1200px;width:100%;margin:0 auto;padding:clamp(30px,5vw,56px) clamp(18px,5vw,60px)" data-view-pane>
+  <main class="fp-panel {{ recommendationsActive }}" data-pane="recommendations" data-view-pane>
     <h2 class="disp" style="margin:0 0 16px;font-size:clamp(34px,6vw,72px);border-bottom:1px solid var(--ink);padding-bottom:16px">Recommendations</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:0">
       <sc-for list="{{ recs }}" as="r" hint-placeholder-count="2">
@@ -308,7 +324,7 @@
   </main>
 
   <!-- ===== CONTACT ===== -->
-  <main style="display:{{ vContact }};flex:1;max-width:1200px;width:100%;margin:0 auto;padding:clamp(30px,5vw,56px) clamp(18px,5vw,60px)" data-view-pane>
+  <main class="fp-panel {{ contactActive }}" data-pane="contact" data-view-pane>
     <div style="{{ contactGridStyle }}" data-contact-grid>
       <div>
         <h2 class="disp" style="margin:0;font-size:clamp(48px,9vw,110px)">Let's<br>build.</h2>
@@ -333,9 +349,11 @@
     </div>
   </main>
 
-  <!-- ===== FOOTER BAR ===== -->
-  <div style="border-top:1px solid var(--line);background:var(--nav)">
-    <div style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:16px clamp(18px,5vw,60px)">
+  </div><!-- /#fp-track -->
+
+  <!-- ===== FOOTER BAR (fixed) ===== -->
+  <div style="position:fixed;bottom:0;left:0;right:0;z-index:40;border-top:1px solid var(--line);background:var(--nav);backdrop-filter:blur(16px) saturate(1.05);-webkit-backdrop-filter:blur(16px) saturate(1.05)">
+    <div style="max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:9px clamp(18px,5vw,60px)">
       <span class="mono" style="font-size:11.5px;color:var(--faint)">© 2026 Jeiko Sy · Cavite, PH · {{ visitorsToday }} today</span>
       <button onClick="{{ toEgg }}" data-cursor class="mono" style="display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--line2);border-radius:2px;color:var(--mut);font-size:11.5px;cursor:pointer;padding:8px 14px">▚ boot PC-OS →</button>
     </div>
@@ -500,7 +518,7 @@ GUIDELINES:
   LIGHT = { '--bg': '#f4f4f2', '--paper': '#ffffff', '--ink': '#0b0b0b', '--mut': '#6a6a67', '--faint': '#a4a49f', '--line': 'rgba(11,11,11,.13)', '--line2': 'rgba(11,11,11,.26)', '--nav': 'rgba(244,244,242,.82)', '--dot': 'rgba(11,11,11,.14)', '--ghempty': 'rgba(11,11,11,.07)' };
   DARK = { '--bg': '#0c0c0c', '--paper': '#161616', '--ink': '#f3f2ee', '--mut': '#9a9a96', '--faint': '#5e5e59', '--line': 'rgba(243,242,238,.14)', '--line2': 'rgba(243,242,238,.26)', '--nav': 'rgba(12,12,12,.82)', '--dot': 'rgba(243,242,238,.13)', '--ghempty': 'rgba(243,242,238,.09)' };
 
-  state = { view: 'home', coinDrop: false, paletteOpen: false, resumeOpen: false, menuOpen: false, chat: [], thinking: false, time: '--:--:--', toast: '', isNarrow: false, theme: 'light', presenceOpen: false, viewers: [], viewerCount: 1, visitorsToday: 1, contribDays: [], contribTotal: 0, activityStatus: 'loading' };
+  state = { view: 'home', coinDrop: false, paletteOpen: false, resumeOpen: false, menuOpen: false, chat: [], thinking: false, time: '--:--:--', toast: '', isNarrow: false, theme: 'light', presenceOpen: false, viewers: [], viewerCount: 1, visitorsToday: 1, contribDays: [], contribTotal: 0, activityStatus: 'loading', mode: 'interactive' };
 
   VIEW_POOL = [
     { initials: 'AM', loc: 'Manila' }, { initials: 'RC', loc: 'Cebu' }, { initials: 'JT', loc: 'Singapore' },
@@ -561,6 +579,25 @@ GUIDELINES:
     try { let p = localStorage.getItem('jeiko-visitor'); if (!p) { p = 'p' + Math.random().toString(36).slice(2, 12); localStorage.setItem('jeiko-visitor', p); } this.pid = p; } catch (e) { this.pid = 'p' + Math.random().toString(36).slice(2, 12); }
     this.heartbeat(); this.hb = setInterval(() => this.heartbeat(), 5000);
     this.loadActivity();
+
+    // one-page track: choose mode, arm scroll-reveal, wire interactions
+    let savedMode = 'interactive';
+    try { const m = localStorage.getItem('jeiko-mode'); if (m === 'simple' || m === 'interactive') savedMode = m; else if (this.reduceMotion()) savedMode = 'simple'; } catch (e) { }
+    this.setState({ mode: savedMode });
+    const arm = () => {
+      const track = document.getElementById('fp-track');
+      if (!track) { setTimeout(arm, 60); return; }
+      track.setAttribute('data-mode', savedMode);
+      track.classList.add('reveal-ready');
+      track.addEventListener('scroll', this.onTrackScroll, { passive: true });
+      track.addEventListener('wheel', this.onWheel, { passive: false });
+      window.addEventListener('scroll', this.onTrackScroll, { passive: true });
+      window.addEventListener('resize', this.onTrackScroll);
+      window.addEventListener('keydown', this.onArrows);
+      this.markActive();
+      setTimeout(this.markActive, 250);
+    };
+    setTimeout(arm, 50);
   }
 
   loadActivity = async () => {
@@ -575,7 +612,7 @@ GUIDELINES:
   componentDidUpdate() {
     if (this._pc !== this.state.chat || this._pt !== this.state.thinking) { this._pc = this.state.chat; this._pt = this.state.thinking; const b = document.getElementById('fp-askbody'); if (b) b.scrollTop = b.scrollHeight; }
   }
-  componentWillUnmount() { clearInterval(this.clock); window.removeEventListener('keydown', this.onKey); if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener('change', this.applyMq); clearTimeout(this.toastTimer); clearTimeout(this.viewTimer); clearInterval(this.hb); }
+  componentWillUnmount() { clearInterval(this.clock); window.removeEventListener('keydown', this.onKey); window.removeEventListener('keydown', this.onArrows); window.removeEventListener('scroll', this.onTrackScroll); window.removeEventListener('resize', this.onTrackScroll); if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener('change', this.applyMq); clearTimeout(this.toastTimer); clearTimeout(this.viewTimer); clearInterval(this.hb); }
 
   heartbeat = async () => {
     try {
@@ -598,16 +635,75 @@ GUIDELINES:
     if (this.KCODE.every((c, i) => this.konami[i] === c)) { this.konami = []; this.toEgg(); }
   };
 
+  reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   go = (v) => {
-    if (v === this.state.view) { this.setState({ menuOpen: false }); return; }
     this.setState({ view: v, menuOpen: false });
-    window.scrollTo(0, 0);
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    setTimeout(() => {
-      document.querySelectorAll('[data-view-pane]').forEach((el) => {
-        if (getComputedStyle(el).display !== 'none') { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; }
-      });
-    }, 0);
+    const el = document.querySelector('.fp-panel[data-pane="' + v + '"]');
+    if (!el) { window.scrollTo(0, 0); return; }
+    const behavior = this.reduceMotion() ? 'auto' : 'smooth';
+    if (this.state.mode === 'interactive') {
+      const track = document.getElementById('fp-track');
+      if (track) track.scrollTo({ left: el.offsetLeft, behavior });
+      el.scrollTop = 0;
+    } else {
+      el.scrollIntoView({ behavior, block: 'start' });
+    }
+  };
+  applyMode = (m) => {
+    const track = document.getElementById('fp-track');
+    if (track) track.setAttribute('data-mode', m);
+    try { localStorage.setItem('jeiko-mode', m); } catch (e) {}
+    this.setState({ mode: m });
+    // after layout swaps, jump to the current panel and refresh active state
+    setTimeout(() => { this.go(this.state.view); this.markActive(); }, 30);
+  };
+  toggleMode = () => this.applyMode(this.state.mode === 'interactive' ? 'simple' : 'interactive');
+
+  markActive = () => {
+    const panels = Array.prototype.slice.call(document.querySelectorAll('.fp-panel'));
+    if (!panels.length) return;
+    let best = null, bestScore = -1;
+    const interactive = this.state.mode === 'interactive';
+    panels.forEach((p) => {
+      const r = p.getBoundingClientRect();
+      const vis = interactive
+        ? Math.max(0, Math.min(r.right, window.innerWidth) - Math.max(r.left, 0))
+        : Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
+      if (vis > bestScore) { bestScore = vis; best = p; }
+    });
+    if (best) {
+      const v = best.getAttribute('data-pane');
+      if (v && v !== this.state.view) this.setState({ view: v });
+    }
+  };
+
+  onTrackScroll = () => { if (this._raf) return; this._raf = requestAnimationFrame(() => { this._raf = 0; this.markActive(); }); };
+
+  onWheel = (e) => {
+    if (this.state.mode !== 'interactive') return;
+    const track = document.getElementById('fp-track');
+    if (!track) return;
+    const panel = e.target && e.target.closest ? e.target.closest('.fp-panel') : null;
+    const dy = e.deltaY, dx = e.deltaX;
+    if (Math.abs(dx) > Math.abs(dy)) return; // real horizontal gesture: let it be
+    if (panel && panel.scrollHeight > panel.clientHeight + 2) {
+      const atTop = panel.scrollTop <= 0;
+      const atBottom = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1;
+      if (!((dy < 0 && atTop) || (dy > 0 && atBottom))) return; // scroll within panel first
+    }
+    e.preventDefault();
+    track.scrollLeft += dy;
+  };
+
+  onArrows = (e) => {
+    if (this.state.mode !== 'interactive') return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const order = ['home', 'work', 'experience', 'skills', 'recommendations', 'contact'];
+    const i = order.indexOf(this.state.view);
+    const ni = e.key === 'ArrowRight' ? Math.min(order.length - 1, i + 1) : Math.max(0, i - 1);
+    if (ni !== i) { e.preventDefault(); this.go(order[ni]); }
   };
   toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
   goHome = () => this.go('home'); goWork = () => this.go('work'); goContact = () => this.go('contact');
@@ -692,7 +788,7 @@ GUIDELINES:
     });
     if (s.thinking) chat.push({ id: 'think', text: 'Thinking…', isAI: true, rowStyle: 'display:flex;align-items:flex-start;gap:10px;justify-content:flex-start', bubbleStyle: 'padding:13px 16px;border-radius:3px 14px 14px 14px;font-size:14px;background:color-mix(in srgb, var(--paper) 80%, transparent);border:1px solid var(--line);color:var(--faint);animation:fpdot 1.2s infinite' });
 
-    const NAV = [['home', 'Index'], ['work', 'Projects'], ['experience', 'Experience'], ['skills', 'Skills'], ['recommendations', 'Notes'], ['contact', 'Contact']];
+    const NAV = [['home', 'Home'], ['work', 'Projects'], ['experience', 'Experience'], ['skills', 'Skills'], ['recommendations', 'Notes'], ['contact', 'Contact']];
     const navItems = NAV.map(([v, label]) => {
       const on = s.view === v;
       const style = nar
@@ -742,11 +838,21 @@ GUIDELINES:
       vRecs: s.view === 'recommendations' ? 'block' : 'none',
       vContact: s.view === 'contact' ? 'block' : 'none',
       navLinksStyle: nar ? (s.menuOpen ? 'position:absolute;top:calc(100% + 8px);left:0;right:0;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:10px;background:var(--nav);backdrop-filter:blur(16px);border:1px solid var(--line2);border-radius:14px;box-shadow:0 16px 44px -16px rgba(0,0,0,.55),0 3px 10px -5px rgba(0,0,0,.3);animation:fpview .22s ease' : 'display:none') : 'display:flex;align-items:center;gap:clamp(16px,2.4vw,30px);margin-left:26px',
-      heroGridStyle: nar ? 'display:grid;grid-template-columns:1fr;gap:26px;margin-top:clamp(24px,3vw,36px)' : 'display:grid;grid-template-columns:1fr minmax(300px,340px);gap:clamp(30px,5vw,64px);align-items:stretch;margin-top:clamp(26px,3vw,42px)',
+      heroGridStyle: nar ? 'display:grid;grid-template-columns:1fr;gap:18px;margin-top:16px' : 'flex:1;min-height:0;display:grid;grid-template-columns:1fr minmax(280px,330px);gap:clamp(28px,4vw,56px);align-items:center;margin-top:clamp(14px,2vw,26px)',
       heroAsideStyle: nar ? 'max-width:300px' : '',
       contactGridStyle: nar ? 'display:grid;grid-template-columns:1fr;gap:34px' : 'display:grid;grid-template-columns:1fr minmax(0,380px);gap:clamp(30px,6vw,80px);align-items:start',
       projects, experience, education, skills, recs, roadmap,
       contribWeeks, contribTotal: s.contribTotal || 0, activityLoading: s.activityStatus === 'loading', activityEmpty: s.activityStatus === 'empty',
+      mode: s.mode, toggleMode: this.toggleMode,
+      modeIcon: s.mode === 'interactive' ? '⇄' : '▤',
+      modeLabel: s.mode === 'interactive' ? 'Interactive' : 'Simple',
+      modeTitle: s.mode === 'interactive' ? 'Switch to a simple vertical layout' : 'Switch to the interactive one-page layout',
+      homeActive: s.view === 'home' ? 'is-active' : '',
+      workActive: s.view === 'work' ? 'is-active' : '',
+      experienceActive: s.view === 'experience' ? 'is-active' : '',
+      skillsActive: s.view === 'skills' ? 'is-active' : '',
+      recommendationsActive: s.view === 'recommendations' ? 'is-active' : '',
+      contactActive: s.view === 'contact' ? 'is-active' : '',
       suggestions, chat, noChat: s.chat.length === 0,
       paletteOpen: s.paletteOpen, resumeOpen: s.resumeOpen, toast: s.toast,
       themeIcon: s.theme === 'light' ? '☾' : '☀', toggleTheme: this.toggleTheme,

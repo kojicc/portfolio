@@ -455,7 +455,7 @@ ABOUT JEIKO:
 - Full-stack developer from General Trias, Cavite, Philippines. Open to full-time roles and freelance builds.
 - Now: Junior Full-Stack Developer at Buri Technologies, building Cast LMS and custom e-learning platforms (SvelteKit front end; Ruby and Django back ends).
 - Before: Software Engineer Intern at Analog Devices, built PRIMA, a C# automation tool that improved internal request processing by about 57.5% and cut cross-team bottlenecks by about 64%.
-- Projects: Greenpasture (clinic management system, built with another developer, live), Reservoia (hotel reservation capstone; team lead; about 30% fewer booking errors), Invoice App (invoicing with PDF export, recurring billing, role based access), Pa ya ba (e-commerce inventory with automated stock sync).
+- Projects: Greenpasture (clinic management system, built with another developer, live), Reservoia (hotel reservation capstone; team lead; about 30% fewer booking errors), SweldoSys (Philippine payroll and workforce app: attendance, approvals, payroll runs, government contribution and BIR reports; built with a teammate, in staging), Pa ya ba (e-commerce inventory with automated stock sync).
 - Education: BS Information Technology, DLSU Dasmarinas, 3.79/4.00 GPA, Dean's Lister.
 - Stack: TypeScript, SvelteKit, Next.js, React, Django, Node.js, Ruby, Python, C#, PostgreSQL, AWS, plus AI assisted development.
 - Strengths: reliability, ownership end to end, turning manual and paper processes into software, clean UX.
@@ -470,7 +470,7 @@ GUIDELINES:
     { index: '01', title: 'Greenpasture', cat: 'PRODUCT · HEALTHCARE', kind: 'FREELANCE · LIVE', role: 'Clinic management system · built with a teammate', period: '2025', url: 'https://greenpastureclinic.com/', metric: 'Real client, live in production', stack: ['Full stack', 'PostgreSQL', 'CMS'], summary: 'A clinic management system I built with another developer, moving a real clinic off paper into one live tool.' },
     { index: '02', title: 'Reservoia', cat: 'PLATFORM · BOOKING', kind: 'CAPSTONE', role: 'Capstone lead · full stack', period: '2024', url: 'https://capstoners.vercel.app/', metric: '30% fewer booking errors', stack: ['Django', 'Next.js', 'PostgreSQL'], summary: 'A hotel reservation platform with real time booking validation and an admin dashboard. I led the team.' },
     { index: '03', title: 'PRIMA', cat: 'AUTOMATION · INTERNAL', kind: 'ANALOG DEVICES', role: 'Software engineer intern', period: '2025', url: '', metric: '57.5% faster processing', stack: ['C#', '.NET', 'PostgreSQL'], summary: 'A C# automation tool routing 90+ daily requests through parallel logic, killing a manual bottleneck.' },
-    { index: '04', title: 'Invoice App', cat: 'BUSINESS TOOLING', kind: 'FREELANCE', role: 'Full stack · freelance', period: '2025', url: '', metric: '70% less manual effort', stack: ['Node.js', 'PostgreSQL'], summary: 'Invoicing with PDF export, recurring billing and role based access for a freelance client.' },
+    { index: '04', title: 'SweldoSys', cat: 'PRODUCT · PAYROLL', kind: 'PRODUCT · STAGING', role: 'Full stack · built with a teammate', period: '2026', url: 'https://staging.sweldosys.com/', metric: 'Attendance to payroll to BIR, one app', stack: ['Next.js', 'Django', 'PostgreSQL'], summary: 'An invite only payroll and workforce app for PH companies: attendance with geofence and selfie checks, approval workflows, payroll runs, and SSS, PhilHealth, Pag-IBIG and BIR reports.' },
     { index: '05', title: 'Pa ya ba', cat: 'E-COMMERCE', kind: 'FREELANCE · LIVE', role: 'Full stack · freelance', period: '2025', url: 'https://kurt-capstone-prx1.vercel.app/', metric: '35% faster fulfillment', stack: ['Next.js', 'Django', 'PostgreSQL'], summary: 'An ecommerce inventory system with automated stock sync, low stock alerts and order notifications.' }
   ];
   EXPERIENCE = [
@@ -668,16 +668,16 @@ GUIDELINES:
     };
     const portrait = PORTRAIT[pMode];
     const portraitImgEl = React.createElement('img', { src: portrait.src, alt: 'Jeiko Sy', style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: portrait.pos, filter: portrait.filter, transition: 'filter .4s ease' } });
-    const hosts = { Greenpasture: 'greenpastureclinic.com', Reservoia: 'capstoners.vercel.app', PRIMA: 'internal · Analog Devices', 'Invoice App': 'private client build', 'Pa ya ba': 'kurt-capstone-prx1.vercel.app' };
-    const imgs = { PRIMA: 'assets/adi.png' };
+    const hosts = { Greenpasture: 'greenpastureclinic.com', Reservoia: 'capstoners.vercel.app', PRIMA: 'internal · Analog Devices', SweldoSys: 'staging.sweldosys.com', 'Pa ya ba': 'kurt-capstone-prx1.vercel.app' };
+    const imgs = { PRIMA: 'assets/adi.png', SweldoSys: 'assets/sweldosys.webp' };
     const rowWork = nar ? 'display:flex;flex-direction:column;gap:18px;padding:28px 0;border-bottom:1px solid var(--line)' : 'display:grid;grid-template-columns:1fr minmax(0,300px);gap:clamp(24px,4vw,56px);align-items:center;padding:clamp(28px,3.5vw,44px) 0;border-bottom:1px solid var(--line)';
     const ICONS = { 'Next.js': 'nextdotjs', 'Django': 'django', 'PostgreSQL': 'postgresql', 'Node.js': 'nodedotjs', '.NET': 'dotnet' };
     const stackItem = (t) => { const slug = ICONS[t]; return { label: t, hasIcon: !!slug, iconEl: slug ? React.createElement('img', { src: 'https://cdn.simpleicons.org/' + slug + '/8a8a87', alt: '', style: { width: '12px', height: '12px', objectFit: 'contain', opacity: .75 } }) : null }; };
     const projects = this.PROJECTS.map((p) => {
       const img = imgs[p.title] || '';
-      const frameEl = p.url ? React.createElement('iframe', { className: 'fp-prev', src: p.url, title: p.title, loading: 'lazy', scrolling: 'no', style: { position: 'absolute', top: 0, left: 0, width: '320%', height: '320%', border: 0, transform: 'scale(.3125)', transformOrigin: 'top left', background: '#fff' } }) : null;
-      const imgEl = (!p.url && img) ? React.createElement('img', { className: 'fp-prev', src: img, alt: p.title, style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' } }) : null;
-      return { index: p.index, title: p.title, cat: p.cat, role: p.role, summary: p.summary, metric: p.metric, stack: p.stack.map(stackItem), url: p.url, host: hosts[p.title] || '', hasUrl: !!p.url, isImg: !p.url && !!img, isBlank: !p.url && !img, frameEl, imgEl, rowStyle: rowWork };
+      const frameEl = (p.url && !img) ? React.createElement('iframe', { className: 'fp-prev', src: p.url, title: p.title, loading: 'lazy', scrolling: 'no', style: { position: 'absolute', top: 0, left: 0, width: '320%', height: '320%', border: 0, transform: 'scale(.3125)', transformOrigin: 'top left', background: '#fff' } }) : null;
+      const imgEl = img ? React.createElement('img', { className: 'fp-prev', src: img, alt: p.title, style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' } }) : null;
+      return { index: p.index, title: p.title, cat: p.cat, role: p.role, summary: p.summary, metric: p.metric, stack: p.stack.map(stackItem), url: p.url, host: hosts[p.title] || '', hasUrl: !!p.url, isImg: !!img, isBlank: !p.url && !img, frameEl, imgEl, rowStyle: rowWork };
     });
     const rowExp = nar ? 'display:grid;grid-template-columns:1fr;gap:8px;padding:24px 0;border-bottom:1px solid var(--line)' : 'display:grid;grid-template-columns:200px 1fr;gap:clamp(20px,4vw,48px);padding:28px 0;border-bottom:1px solid var(--line)';
     const experience = this.EXPERIENCE.map((e) => Object.assign({}, e, { rowStyle: rowExp }));

@@ -9,7 +9,7 @@ WHO JEIKO IS (use this, do not invent anything beyond it):
 - Full-stack developer from General Trias, Cavite, Philippines. Open to full-time roles and freelance builds.
 - Now: Junior Full-Stack Developer at Buri Technologies — building Cast LMS and custom e-learning platforms (SvelteKit front end; Ruby & Django back ends).
 - Before: Software Engineer Intern at Analog Devices — built PRIMA, a C# automation tool that sped internal request processing by ~57.5%.
-- Freelance / personal builds: Greenpasture (clinic management system), Reservoia (hotel reservation capstone; team lead; cut booking errors ~30%), Invoice-App (invoicing with PDF export + role-based access), Pa-ya-ba (e-commerce inventory with automated stock sync).
+- Freelance / personal builds: Greenpasture (clinic management system), Reservoia (hotel reservation capstone; team lead; cut booking errors ~30%), SweldoSys (PH payroll + workforce app, built with a teammate, in staging), Pa-ya-ba (e-commerce inventory with automated stock sync).
 - Education: BS Information Technology, DLSU-Dasmariñas, 3.79/4.00 GPA, Dean's Lister.
 - Stack: TypeScript, SvelteKit, Next.js, React, Django, Node.js, Ruby, Python, C#, PostgreSQL, AWS, plus AI-assisted development.
 - Off the clock: gaming, horror games, cooking, dogs, and chasing his own One Piece.
